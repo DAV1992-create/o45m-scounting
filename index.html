@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>England Hockey — O45M Scouting 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');
+:root{
+  --red:#C8102E;--red-dark:#9a0c22;--red-bg:rgba(200,16,46,0.08);
+  --white:#fff;--off:#f5f5f5;--light:#eeeeee;--border:#e0e0e0;
+  --muted:#888;--dark:#1a1a1a;--sidebar:#1c1c1c;
+  --green:#1a7a3c;--green-bg:rgba(26,122,60,0.1);
+  --amber:#b85c00;--amber-bg:rgba(184,92,0,0.1);
+  --reject:#9a0c22;--reject-bg:rgba(154,12,34,0.08);
+  --shadow:0 2px 8px rgba(0,0,0,0.09);--shadow-lg:0 6px 20px rgba(0,0,0,0.14);
+  --sidebar-w:210px;
+  --touch:48px; /* minimum touch target */
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Barlow',sans-serif;background:var(--light);color:var(--dark);}
+
+/* ── SYNC STATUS BAR ── */
+#syncBar{
+  position:fixed;top:0;left:0;right:0;
+  height:3px;background:transparent;z-index:1000;
+  transition:background 0.3s;
+}
+#syncBar.syncing{background:var(--amber);}
+#syncBar.synced{background:var(--green);}
+#syncBar.error{background:var(--red);}
+
+/* ── HEADER ── */
+header{
+  background:var(--red);height:56px;
+  display:flex;align-items:center;padding:0 16px;gap:12px;
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  box-shadow:0 2px 10px rgba(200,16,46,0.4);
+}
+.logo-img{height:38px;width:auto;filter:brightness(0) invert(1);flex-shrink:0;}
+.hdr-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;letter-spacing:0.05em;text-transform:uppercase;color:white;line-height:1.15;}
+.hdr-title small{font-size:10px;font-weight:400;letter-spacing:0.08em;display:block;opacity:0.8;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.stat-chip{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:3px 10px;font-size:11px;font-weight:700;color:white;white-space:nowrap;}
+.sync-indicator{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,0.8);font-weight:600;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.4);transition:background 0.3s;}
+.sync-dot.live{background:#4cff91;box-shadow:0 0 6px #4cff91;}
+.sync-dot.syncing{background:var(--amber);animation:pulse 1s infinite;}
+.sync-dot.error{background:#ff6b6b;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* Sidebar toggle button (mobile/iPad) */
+.menu-btn{
+  background:rgba(255,255,255,0.15);border:none;
+  border-radius:8px;width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;
+}
+.menu-btn svg{width:18px;height:18px;fill:white;}
+
+/* ── LAYOUT ── */
+.app{
+  display:flex;
+  height:100dvh;
+  padding-top:56px;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);
+  background:var(--sidebar);
+  overflow-y:auto;overflow-x:hidden;
+  padding:10px 0 30px;
+  position:fixed;left:0;top:56px;bottom:0;
+  z-index:200;
+  transform:translateX(-100%);
+  transition:transform 0.25s ease;
+  -webkit-overflow-scrolling:touch;
+}
+.sidebar.open{transform:translateX(0);}
+/* iPad landscape — always show sidebar */
+@media (min-width:900px){
+  .sidebar{transform:translateX(0);position:relative;top:auto;bottom:auto;flex-shrink:0;}
+  .menu-btn{display:none;}
+  .sidebar-overlay{display:none!important;}
+}
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:199;
+}
+.sidebar-overlay.show{display:block;}
+
+.sb-search{padding:8px 10px 8px;}
+.sb-input{
+  width:100%;background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);border-radius:8px;
+  padding:9px 12px;color:white;font-size:14px;
+  font-family:'Barlow',sans-serif;outline:none;
+  -webkit-appearance:none;
+}
+.sb-input::placeholder{color:rgba(255,255,255,0.3);}
+.sb-input:focus{border-color:var(--red);}
+.sb-label{font-size:9px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:10px 10px 4px;display:block;}
+.sb-btn{
+  display:flex;justify-content:space-between;align-items:center;
+  width:100%;min-height:var(--touch);padding:0 10px;
+  background:transparent;border:none;
+  color:rgba(255,255,255,0.55);font-size:13px;font-weight:500;
+  font-family:'Barlow',sans-serif;text-align:left;cursor:pointer;
+  border-left:3px solid transparent;transition:all 0.12s;
+}
+.sb-btn:hover,.sb-btn:active{color:white;background:rgba(255,255,255,0.06);}
+.sb-btn.active{color:white;background:rgba(200,16,46,0.2);border-left-color:var(--red);}
+.sb-count{font-size:10px;font-weight:700;background:rgba(255,255,255,0.1);border-radius:10px;padding:1px 7px;min-width:22px;text-align:center;}
+.sb-btn.active .sb-count{background:rgba(200,16,46,0.4);}
+.area-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:7px;flex-shrink:0;}
+.sb-div{height:1px;background:rgba(255,255,255,0.07);margin:6px 10px;}
+.sq-legend{padding:4px 10px 8px;display:flex;flex-direction:column;gap:5px;}
+.sq-leg-row{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(255,255,255,0.4);}
+.sq-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+
+/* ── MAIN ── */
+.main{
+  flex:1;display:flex;flex-direction:column;
+  min-width:0;overflow:hidden;
+  margin-left:0;
+}
+@media(min-width:900px){.main{margin-left:0;}}
+
+.view-nav{
+  background:white;border-bottom:1px solid var(--border);
+  display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding:0 12px;position:sticky;top:0;z-index:100;
+  scrollbar-width:none;
+}
+.view-nav::-webkit-scrollbar{display:none;}
+.view-tab{
+  background:transparent;border:none;
+  border-bottom:3px solid transparent;
+  padding:0 14px;height:46px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:800;letter-spacing:0.07em;
+  text-transform:uppercase;color:var(--muted);
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  margin-bottom:-1px;transition:color 0.15s;
+}
+.view-tab.active{color:var(--red);border-bottom-color:var(--red);}
+
+.view-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px;-webkit-overflow-scrolling:touch;}
+
+/* ── GRID ── */
+#gridView{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+@media(max-width:600px){#gridView{grid-template-columns:1fr;}}
+#listView{display:none;flex-direction:column;gap:4px;}
+#scheduleView{display:none;}
+#summaryView{display:none;}
+
+/* ── PLAYER CARD ── */
+.player-card{background:white;border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow 0.2s;}
+.card-strip{height:6px;}
+.card-body{padding:14px 14px 12px;}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.card-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:17px;letter-spacing:0.02em;color:var(--dark);line-height:1.15;}
+.card-club{font-size:11px;color:var(--muted);margin-top:2px;}
+.card-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:26px;color:#ddd;line-height:1;flex-shrink:0;}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;align-items:center;}
+.tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;}
+.tag-area{color:white;}
+.tag-area.light{color:#1a1a1a;}
+.tag-gk{background:#fff3e0;color:#b85c00;}
+.tag-out{background:#e8f4fd;color:#1565c0;}
+.tag-cap{background:#fff8e1;color:#b8860b;}
+.sq-badge{padding:3px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;}
+.sq-badge.main{background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;}
+.sq-badge.main-ntr{background:#f3f8ff;color:#5c8bcc;border:1px solid #c5d9f5;}
+.sq-badge.som{background:#f3e5f5;color:#7b1fa2;border:1px solid #ce93d8;}
+.sq-badge.som-ntr{background:#faf0fc;color:#9c5ab8;border:1px solid #e2c0ef;}
+
+/* Ratings — larger touch targets on iPad */
+.ratings-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.rating-item label{display:block;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.stars{display:flex;gap:3px;}
+.star{width:22px;height:22px;cursor:pointer;flex-shrink:0;padding:2px;}
+.star svg{width:100%;height:100%;display:block;}
+
+.notes-field{
+  width:100%;background:#f8f8f8;border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;
+  font-family:'Barlow',sans-serif;font-size:13px;line-height:1.5;
+  color:var(--dark);resize:none;outline:none;min-height:56px;
+  -webkit-appearance:none;transition:border-color 0.15s;
+}
+.notes-field:focus{border-color:var(--red);background:white;}
+.notes-field::placeholder{color:#ccc;}
+
+.dec-row{display:flex;gap:6px;margin-top:10px;}
+.dec-btn{
+  flex:1;min-height:40px;padding:0 4px;
+  border-radius:8px;border:1.5px solid;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px;font-weight:800;letter-spacing:0.07em;
+  text-transform:uppercase;cursor:pointer;
+  background:transparent;transition:all 0.15s;
+}
+.dec-btn.recommend{border-color:#b2dfdb;color:var(--green);}
+.dec-btn.recommend.active,.dec-btn.recommend:active{background:var(--green);border-color:var(--green);color:white;}
+.dec-btn.monitor{border-color:#ffe0b2;color:var(--amber);}
+.dec-btn.monitor.active,.dec-btn.monitor:active{background:var(--amber);border-color:var(--amber);color:white;}
+.dec-btn.reject{border-color:#ffcdd2;color:var(--reject);}
+.dec-btn.reject.active,.dec-btn.reject:active{background:var(--reject);border-color:var(--reject);color:white;}
+
+/* Syncing spinner on card */
+.card-sync{height:2px;background:transparent;transition:background 0.3s;border-radius:0 0 2px 2px;}
+.card-sync.saving{background:var(--amber);}
+.card-sync.saved{background:var(--green);}
+
+/* ── LIST VIEW ── */
+.list-hdr,.list-row{
+  display:grid;
+  grid-template-columns:36px 1fr 90px 50px 100px 130px;
+  gap:8px;align-items:center;padding:10px 12px;border-radius:8px;
+}
+@media(max-width:700px){
+  .list-hdr,.list-row{grid-template-columns:30px 1fr 70px 100px;}
+  .list-hide{display:none;}
+}
+.list-hdr{background:white;border:1px solid var(--border);font-size:9px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;z-index:10;}
+.list-row{background:white;border:1px solid var(--border);border-left:4px solid var(--lc,var(--border));transition:border-color 0.12s;}
+.list-row.recommended{border-left-color:var(--green)!important;}
+.list-row.monitor{border-left-color:var(--amber)!important;}
+.list-row.not-selected{border-left-color:var(--reject)!important;}
+.list-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:14px;}
+.mini-stars{display:flex;gap:1px;font-size:13px;}
+.ldec-row{display:flex;gap:3px;}
+.ldec{min-height:32px;padding:0 7px;border-radius:5px;border:1px solid;font-size:10px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;background:transparent;transition:all 0.12s;}
+.ldec.recommend{border-color:#b2dfdb;color:var(--green);}
+.ldec.recommend.active{background:var(--green);border-color:var(--green);color:white;}
+.ldec.monitor{border-color:#ffe0b2;color:var(--amber);}
+.ldec.monitor.active{background:var(--amber);border-color:var(--amber);color:white;}
+.ldec.reject{border-color:#ffcdd2;color:var(--reject);}
+.ldec.reject.active{background:var(--reject);border-color:var(--reject);color:white;}
+
+/* ── SCHEDULE ── */
+.sched-day{margin-bottom:24px;}
+.sched-hdr{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;letter-spacing:0.05em;text-transform:uppercase;color:var(--red);margin-bottom:10px;padding-bottom:7px;border-bottom:3px solid var(--red);display:flex;align-items:center;gap:12px;}
+.sched-hdr span{font-size:12px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;}
+.sched-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+@media(max-width:600px){.sched-grid{grid-template-columns:1fr;}}
+.pitch-lbl{font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:4px 10px;background:var(--light);border-radius:4px;text-align:center;}
+.fixture{background:white;border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:var(--shadow);transition:all 0.15s;min-height:var(--touch);}
+.fixture.active-game{border-color:var(--red);background:#fff5f5;}
+.fix-time{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;color:var(--red);min-width:40px;}
+.fix-teams{flex:1;min-width:0;}
+.fix-match{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.fix-team{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;display:flex;align-items:center;gap:5px;}
+.fix-vs{font-size:10px;font-weight:700;color:var(--muted);}
+.kit-sw{width:12px;height:12px;border-radius:2px;border:1px solid rgba(0,0,0,0.1);flex-shrink:0;}
+.fix-pitch{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:0.07em;text-transform:uppercase;margin-top:2px;}
+.fix-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;min-height:36px;padding:0 12px;border-radius:6px;border:1.5px solid var(--red);color:var(--red);background:transparent;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0;}
+.fix-btn.active-btn,.fixture.active-game .fix-btn{background:var(--red);color:white;}
+.fix-banner{background:var(--red);color:white;padding:10px 14px;display:flex;align-items:center;gap:10px;border-radius:10px;margin-bottom:14px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;flex-wrap:wrap;gap:8px;}
+.fix-clear{background:rgba(255,255,255,0.2);border:none;color:white;border-radius:5px;padding:5px 12px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;min-height:32px;}
+
+/* ── SUMMARY ── */
+.sum-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+@media(max-width:600px){.sum-stats{grid-template-columns:repeat(2,1fr);}}
+.sum-stat{background:white;border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;box-shadow:var(--shadow);}
+.sum-num{font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:900;line-height:1;margin-bottom:4px;}
+.sum-lbl{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.sum-stat.rec .sum-num{color:var(--green);}
+.sum-stat.mon .sum-num{color:var(--amber);}
+.sum-stat.rej .sum-num{color:var(--reject);}
+.sum-stat.tot .sum-num{color:var(--red);}
+.sum-sec-hdr{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:0.06em;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin:18px 0 9px;color:var(--dark);}
+.sum-sec-hdr::after{content:'';flex:1;height:2px;background:var(--border);}
+.sum-sec-hdr.rh::after{background:var(--green);}
+.sum-sec-hdr.mh::after{background:var(--amber);}
+.sum-rows{display:flex;flex-direction:column;gap:5px;}
+.sum-row{background:white;border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:grid;grid-template-columns:170px 110px 50px 50px 1fr;gap:10px;align-items:center;box-shadow:var(--shadow);}
+@media(max-width:700px){.sum-row{grid-template-columns:1fr 80px 40px;}.sum-hide{display:none;}}
+.sum-row.rec{border-left:4px solid var(--green);}
+.sum-row.mon{border-left:4px solid var(--amber);}
+.sum-row-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;}
+.sum-score{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;}
+.sum-score.hi{color:var(--green);}
+.sum-score.mid{color:var(--amber);}
+.sum-notes{font-size:11px;color:var(--muted);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.export-btn{background:var(--red);color:white;border:none;border-radius:8px;padding:12px 28px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;margin-top:18px;min-height:var(--touch);}
+
+/* Empty */
+.empty{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty h3{font-family:'Barlow Condensed',sans-serif;font-size:20px;color:var(--dark);margin-bottom:6px;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:rgba(200,16,46,0.25);border-radius:2px;}
+
+/* Loading overlay */
+#loadingOverlay{
+  position:fixed;inset:0;background:var(--red);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:9999;transition:opacity 0.4s;
+}
+#loadingOverlay img{height:80px;filter:brightness(0) invert(1);margin-bottom:20px;}
+#loadingOverlay p{color:white;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;opacity:0.9;}
+#loadingOverlay .spin{width:28px;height:28px;border:3px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;margin-top:16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div id="syncBar"></div>
+
+<!-- Loading screen -->
+<div id="loadingOverlay">
+  <img src="/mnt/user-data/uploads/England_Masters_Logo.png" alt="England Hockey Masters">
+  <p>Loading Scouting System</p>
+  <div class="spin"></div>
+</div>
+
+<header>
+  <button class="menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><rect y="4" width="24" height="2" rx="1"/><rect y="11" width="24" height="2" rx="1"/><rect y="18" width="24" height="2" rx="1"/></svg>
+  </button>
+  <img class="logo-img" src="/mnt/user-data/uploads/England_Masters_Logo.png" alt="">
+  <div>
+    <div class="hdr-title">O45M Scouting<small>Area Champs · 16–17 May 2026</small></div>
+  </div>
+  <div class="hdr-right">
+    <div class="sync-indicator">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncLabel">Connecting…</span>
+    </div>
+    <div class="stat-chip">🟢 <span id="recCount">0</span></div>
+    <div class="stat-chip">🟡 <span id="monCount">0</span></div>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<div class="app">
+  <div class="sidebar" id="sidebar">
+    <div class="sb-search"><input class="sb-input" type="search" id="searchInput" placeholder="Search player or club…" autocorrect="off" autocapitalize="off"></div>
+
+    <span class="sb-label">Area</span>
+    <button class="sb-btn active" data-area="ALL" onclick="setArea('ALL')">All Areas <span class="sb-count" id="cnt-ALL">142</span></button>
+    <button class="sb-btn" data-area="East" onclick="setArea('East')"><span class="area-dot" style="background:#f5c800;border:1px solid rgba(255,255,255,0.2)"></span>East <span class="sb-count">18</span></button>
+    <button class="sb-btn" data-area="London" onclick="setArea('London')"><span class="area-dot" style="background:#C8102E"></span>London <span class="sb-count">18</span></button>
+    <button class="sb-btn" data-area="Midlands" onclick="setArea('Midlands')"><span class="area-dot" style="background:#6a0dad"></span>Midlands <span class="sb-count">17</span></button>
+    <button class="sb-btn" data-area="North West" onclick="setArea('North West')"><span class="area-dot" style="background:#1565c0"></span>North West <span class="sb-count">17</span></button>
+    <button class="sb-btn" data-area="South East" onclick="setArea('South East')"><span class="area-dot" style="background:#e86500"></span>South East <span class="sb-count">18</span></button>
+    <button class="sb-btn" data-area="South Central" onclick="setArea('South Central')"><span class="area-dot" style="background:#1a7a3c"></span>South Central <span class="sb-count">18</span></button>
+    <button class="sb-btn" data-area="West" onclick="setArea('West')"><span class="area-dot" style="background:#6b1a3a"></span>West <span class="sb-count">18</span></button>
+    <button class="sb-btn" data-area="Yorkshire & NE" onclick="setArea('Yorkshire & NE')"><span class="area-dot" style="background:#5ba4cf"></span>Yorkshire & NE <span class="sb-count">18</span></button>
+
+    <div class="sb-div"></div>
+    <span class="sb-label">Decision</span>
+    <button class="sb-btn" data-dec="ALL_D" onclick="setDecFilter('ALL_D')">All <span class="sb-count" id="cnt-ALLD">142</span></button>
+    <button class="sb-btn" data-dec="recommended" onclick="setDecFilter('recommended')">✅ Trials <span class="sb-count" id="cnt-REC">0</span></button>
+    <button class="sb-btn" data-dec="monitor" onclick="setDecFilter('monitor')">⚡ Monitor <span class="sb-count" id="cnt-MON">0</span></button>
+    <button class="sb-btn" data-dec="not-selected" onclick="setDecFilter('not-selected')">✗ Passed <span class="sb-count" id="cnt-REJ">0</span></button>
+    <button class="sb-btn" data-dec="unseen" onclick="setDecFilter('unseen')">○ Unseen <span class="sb-count" id="cnt-UN">142</span></button>
+
+    <div class="sb-div"></div>
+    <span class="sb-label">Position</span>
+    <button class="sb-btn" data-pos="ALL_P" onclick="setPosFilter('ALL_P')">All</button>
+    <button class="sb-btn" data-pos="GK" onclick="setPosFilter('GK')">Goalkeepers</button>
+    <button class="sb-btn" data-pos="Outfield" onclick="setPosFilter('Outfield')">Outfield</button>
+
+    <div class="sb-div"></div>
+    <span class="sb-label">Squad Status</span>
+    <button class="sb-btn active" data-squad="ALL_S" onclick="setSquadFilter('ALL_S')">All <span class="sb-count" id="cnt-SQ-ALL">142</span></button>
+    <button class="sb-btn" data-squad="main" onclick="setSquadFilter('main')">Main Squad <span class="sb-count" id="cnt-SQ-MAIN">0</span></button>
+    <button class="sb-btn" data-squad="main-ntr" onclick="setSquadFilter('main-ntr')">Main NTR <span class="sb-count" id="cnt-SQ-MAINNTR">0</span></button>
+    <button class="sb-btn" data-squad="som" onclick="setSquadFilter('som')">SOM <span class="sb-count" id="cnt-SQ-SOM">0</span></button>
+    <button class="sb-btn" data-squad="som-ntr" onclick="setSquadFilter('som-ntr')">SOM NTR <span class="sb-count" id="cnt-SQ-SOMNTR">0</span></button>
+    <button class="sb-btn" data-squad="none" onclick="setSquadFilter('none')">No Squad <span class="sb-count" id="cnt-SQ-NONE">0</span></button>
+
+    <div class="sb-div"></div>
+    <span class="sb-label">Squad Key</span>
+    <div class="sq-legend">
+      <div class="sq-leg-row"><div class="sq-dot" style="background:#1565c0"></div>Main Squad</div>
+      <div class="sq-leg-row"><div class="sq-dot" style="background:#5c8bcc"></div>Main NTR</div>
+      <div class="sq-leg-row"><div class="sq-dot" style="background:#7b1fa2"></div>SOM (B Squad)</div>
+      <div class="sq-leg-row"><div class="sq-dot" style="background:#9c5ab8"></div>SOM NTR</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="view-nav">
+      <button class="view-tab active" onclick="setView('grid')">Grid</button>
+      <button class="view-tab" onclick="setView('list')">List</button>
+      <button class="view-tab" onclick="setView('schedule')">Schedule</button>
+      <button class="view-tab" onclick="setView('summary')">Summary</button>
+    </div>
+    <div class="view-content">
+      <div id="gridView"></div>
+      <div id="listView"></div>
+      <div id="scheduleView"></div>
+      <div id="summaryView"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SB_URL = 'https://yunzbxjgndfdngneydhf.supabase.co';
+const SB_KEY = 'sb_publishable_a0WnjBJyvWkqNFALG7ZhGA_mMUVzD1C';
+const POLL_INTERVAL = 4000; // poll every 4 seconds for remote changes
+
+// ── AREA COLOURS ──────────────────────────────────────────────────────────────
+const AC = {
+  'East':'#f5c800','London':'#C8102E','Midlands':'#6a0dad',
+  'North West':'#1565c0','South East':'#e86500','South Central':'#1a7a3c',
+  'West':'#6b1a3a','Yorkshire & NE':'#5ba4cf'
+};
+const LIGHT_KITS = ['East','Yorkshire & NE'];
+
+// ── SCHEDULE ──────────────────────────────────────────────────────────────────
+const SCHED = {
+  saturday:[
+    {time:'11:00',pitch:'Stirratt',home:'East',away:'Midlands'},
+    {time:'11:00',pitch:'BGS',home:'West',away:'South Central'},
+    {time:'12:00',pitch:'Stirratt',home:'South East',away:'Yorkshire & NE'},
+    {time:'12:00',pitch:'BGS',home:'North West',away:'London'},
+    {time:'12:50',pitch:'Stirratt',home:'North West',away:'South Central'},
+    {time:'12:50',pitch:'BGS',home:'West',away:'London'},
+    {time:'13:40',pitch:'Stirratt',home:'South East',away:'Midlands'},
+    {time:'13:40',pitch:'BGS',home:'East',away:'Yorkshire & NE'},
+    {time:'14:30',pitch:'Stirratt',home:'West',away:'Midlands'},
+    {time:'14:30',pitch:'BGS',home:'East',away:'South Central'},
+    {time:'15:20',pitch:'Stirratt',home:'North West',away:'Yorkshire & NE'},
+    {time:'15:20',pitch:'BGS',home:'London',away:'South East'},
+    {time:'16:10',pitch:'Stirratt',home:'South Central',away:'Yorkshire & NE'},
+    {time:'16:10',pitch:'BGS',home:'East',away:'West'},
+    {time:'17:00',pitch:'Stirratt',home:'London',away:'Midlands'},
+    {time:'17:00',pitch:'BGS',home:'North West',away:'South East'},
+  ],
+  sunday:[
+    {time:'10:00',pitch:'Stirratt',home:'South East',away:'East'},
+    {time:'10:00',pitch:'BGS',home:'Yorkshire & NE',away:'London'},
+    {time:'11:00',pitch:'Stirratt',home:'West',away:'North West'},
+    {time:'11:00',pitch:'BGS',home:'South Central',away:'Midlands'},
+    {time:'11:50',pitch:'Stirratt',home:'East',away:'London'},
+    {time:'11:50',pitch:'BGS',home:'South Central',away:'South East'},
+    {time:'12:40',pitch:'Stirratt',home:'West',away:'Yorkshire & NE'},
+    {time:'12:40',pitch:'BGS',home:'Midlands',away:'North West'},
+    {time:'13:30',pitch:'Stirratt',home:'West',away:'South East'},
+    {time:'13:30',pitch:'BGS',home:'South Central',away:'London'},
+    {time:'14:20',pitch:'Stirratt',home:'Midlands',away:'Yorkshire & NE'},
+    {time:'14:20',pitch:'BGS',home:'East',away:'North West'},
+  ]
+};
+
+// ── PLAYERS ───────────────────────────────────────────────────────────────────
+const rawPlayers=[
+{id:1,name:"Neal Hadgraft",shirt:"GK",area:"East",club:"Brentwood",pos:"GK",cap:false,squad:"main"},
+{id:2,name:"Alex Ford",shirt:"GK",area:"East",club:"Broxbourne",pos:"GK",cap:false,squad:""},
+{id:3,name:"James Ward",shirt:"2",area:"East",club:"Ipswich",pos:"Outfield",cap:false,squad:""},
+{id:4,name:"Andrew Fletcher",shirt:"3",area:"East",club:"City of Peterborough",pos:"Outfield",cap:false,squad:""},
+{id:5,name:"Ian Dunnett",shirt:"4",area:"East",club:"Hertford",pos:"Outfield",cap:false,squad:""},
+{id:6,name:"Carl Daniels",shirt:"5",area:"East",club:"City of Peterborough",pos:"Outfield",cap:false,squad:""},
+{id:7,name:"Jon Card",shirt:"6",area:"East",club:"Ipswich",pos:"Outfield",cap:true,capType:"VC",squad:""},
+{id:8,name:"Paul Buckland",shirt:"7",area:"East",club:"Blueharts",pos:"Outfield",cap:false,squad:"som"},
+{id:9,name:"Alex Scott",shirt:"8",area:"East",club:"Norwich City",pos:"Outfield",cap:false,squad:""},
+{id:10,name:"Graham Burr",shirt:"9",area:"East",club:"Blueharts",pos:"Outfield",cap:false,squad:""},
+{id:11,name:"Chris Page",shirt:"10",area:"East",club:"Pelicans",pos:"Outfield",cap:false,squad:"som"},
+{id:12,name:"Matt Scott",shirt:"11",area:"East",club:"Blueharts",pos:"Outfield",cap:false,squad:""},
+{id:13,name:"Richard Stainthorpe",shirt:"12",area:"East",club:"Dereham",pos:"Outfield",cap:true,capType:"C",squad:""},
+{id:14,name:"Drew Harvey",shirt:"13",area:"East",club:"Wisbech Town",pos:"Outfield",cap:false,squad:""},
+{id:15,name:"Mark Hoefield",shirt:"14",area:"East",club:"St Albans",pos:"Outfield",cap:false,squad:""},
+{id:16,name:"Devon Woolley",shirt:"15",area:"East",club:"Blueharts",pos:"Outfield",cap:false,squad:""},
+{id:17,name:"Ben Hudson",shirt:"16",area:"East",club:"Cambridge HC",pos:"Outfield",cap:false,squad:""},
+{id:18,name:"Richard Marshall",shirt:"17",area:"East",club:"Chelmsford",pos:"Outfield",cap:false,squad:""},
+{id:19,name:"Ben Brind",shirt:"GK",area:"London",club:"Hampstead & Westminster",pos:"GK",cap:false,squad:""},
+{id:20,name:"Sam Hext",shirt:"GK",area:"London",club:"Hampstead & Westminster",pos:"GK",cap:false,squad:""},
+{id:21,name:"Paul Barker",shirt:"3",area:"London",club:"Spencer",pos:"Outfield",cap:false,squad:""},
+{id:22,name:"Andy Fell",shirt:"4",area:"London",club:"Southgate",pos:"Outfield",cap:false,squad:""},
+{id:23,name:"Ash Garratt",shirt:"5",area:"London",club:"Old Cranleighans",pos:"Outfield",cap:false,squad:"main-ntr"},
+{id:24,name:"Rhys Evans",shirt:"6",area:"London",club:"Teddington",pos:"Outfield",cap:false,squad:""},
+{id:25,name:"Andrew Crow",shirt:"7",area:"London",club:"Spencer",pos:"Outfield",cap:false,squad:"som"},
+{id:26,name:"Mark Henderson",shirt:"8",area:"London",club:"Cheam",pos:"Outfield",cap:false,squad:""},
+{id:27,name:"Stuart Ripley",shirt:"9",area:"London",club:"Old Cranleighans",pos:"Outfield",cap:false,squad:"som-ntr"},
+{id:28,name:"Ed Hauck",shirt:"10",area:"London",club:"Old Cranleighans",pos:"Outfield",cap:false,squad:""},
+{id:29,name:"Barney Hillsdon",shirt:"11",area:"London",club:"Purley Walcountians",pos:"Outfield",cap:false,squad:""},
+{id:30,name:"Antoine-Julien Richard",shirt:"12",area:"London",club:"Hampstead & Westminster",pos:"Outfield",cap:false,squad:""},
+{id:31,name:"Richard Mills",shirt:"13",area:"London",club:"Old Cranleighans",pos:"Outfield",cap:false,squad:""},
+{id:32,name:"James Nicholson",shirt:"14",area:"London",club:"Wimbledon",pos:"Outfield",cap:false,squad:""},
+{id:33,name:"Stephen Quincey",shirt:"15",area:"London",club:"Surbiton",pos:"Outfield",cap:false,squad:""},
+{id:34,name:"Phil Price",shirt:"16",area:"London",club:"East London",pos:"Outfield",cap:false,squad:""},
+{id:35,name:"Jonathan Jauncey",shirt:"17",area:"London",club:"Old Cranleighans",pos:"Outfield",cap:false,squad:""},
+{id:36,name:"Raymond Man",shirt:"18",area:"London",club:"Purley Walcountians",pos:"Outfield",cap:true,capType:"C",squad:"som-ntr"},
+{id:37,name:"Jonathon Short",shirt:"GK",area:"Midlands",club:"Boots HC",pos:"GK",cap:false,squad:"main"},
+{id:38,name:"Matthew Hyatt",shirt:"2",area:"Midlands",club:"Stratford HC",pos:"Outfield",cap:false,squad:""},
+{id:39,name:"Andrew Heslop",shirt:"4",area:"Midlands",club:"Olton HC",pos:"Outfield",cap:false,squad:""},
+{id:40,name:"Ben Lanoe",shirt:"5",area:"Midlands",club:"Stratford HC",pos:"Outfield",cap:false,squad:""},
+{id:41,name:"Jed Kiddle Morris",shirt:"6",area:"Midlands",club:"Bournville & KH",pos:"Outfield",cap:false,squad:""},
+{id:42,name:"Richard Major",shirt:"8",area:"Midlands",club:"Bournville & KH",pos:"Outfield",cap:true,capType:"C",squad:""},
+{id:43,name:"Dafydd Bowles",shirt:"9",area:"Midlands",club:"Hampton in Arden",pos:"Outfield",cap:false,squad:"main"},
+{id:44,name:"Jon Allchin",shirt:"10",area:"Midlands",club:"Stone HC",pos:"Outfield",cap:false,squad:""},
+{id:45,name:"Mark Northcott",shirt:"11",area:"Midlands",club:"Burton HC",pos:"Outfield",cap:false,squad:"som"},
+{id:46,name:"Andrew Tchakhotine",shirt:"12",area:"Midlands",club:"Old Silhillians HC",pos:"Outfield",cap:false,squad:""},
+{id:47,name:"Terry Lavery",shirt:"13",area:"Midlands",club:"Harborne HC",pos:"Outfield",cap:false,squad:""},
+{id:48,name:"Dom Williams",shirt:"14",area:"Midlands",club:"Beeston HC",pos:"Outfield",cap:false,squad:""},
+{id:49,name:"Richard Kitchen",shirt:"15",area:"Midlands",club:"Belper HC",pos:"Outfield",cap:false,squad:"main"},
+{id:50,name:"Gareth Parker",shirt:"17",area:"Midlands",club:"Northampton Saints",pos:"Outfield",cap:false,squad:""},
+{id:51,name:"Stuart Clark",shirt:"19",area:"Midlands",club:"Northampton Saints",pos:"Outfield",cap:false,squad:""},
+{id:52,name:"Stephen Maundrell",shirt:"36",area:"Midlands",club:"Derby HC",pos:"Outfield",cap:false,squad:""},
+{id:53,name:"David Bryce",shirt:"—",area:"Midlands",club:"Khalsa HC",pos:"Outfield",cap:false,squad:""},
+{id:54,name:"Chris Bond",shirt:"GK",area:"North West",club:"Keswick",pos:"GK",cap:false,squad:""},
+{id:55,name:"Geoff Price",shirt:"3",area:"North West",club:"Deeside Ramblers",pos:"Outfield",cap:false,squad:""},
+{id:56,name:"Andrew Kwan",shirt:"4",area:"North West",club:"Didsbury Northern",pos:"Outfield",cap:false,squad:""},
+{id:57,name:"Gareth Edwards-Jones",shirt:"5",area:"North West",club:"Golborne & Prescot",pos:"Outfield",cap:true,capType:"C",squad:""},
+{id:58,name:"Richard Campbell",shirt:"6",area:"North West",club:"Crewe Vagrants",pos:"Outfield",cap:false,squad:""},
+{id:59,name:"Graeme Hunt",shirt:"7",area:"North West",club:"Didsbury Northern",pos:"Outfield",cap:false,squad:""},
+{id:60,name:"Damien Axcell",shirt:"8",area:"North West",club:"Macclesfield",pos:"Outfield",cap:false,squad:""},
+{id:61,name:"Peter Youds",shirt:"9",area:"North West",club:"Macclesfield",pos:"Outfield",cap:false,squad:""},
+{id:62,name:"David Hans",shirt:"10",area:"North West",club:"Timperley",pos:"Outfield",cap:false,squad:"main"},
+{id:63,name:"Simon Boulton",shirt:"11",area:"North West",club:"Golborne & Prescot",pos:"Outfield",cap:false,squad:""},
+{id:64,name:"John Bardsley",shirt:"12",area:"North West",club:"Sale",pos:"Outfield",cap:false,squad:""},
+{id:65,name:"Adam Jones",shirt:"13",area:"North West",club:"Stockport Bramhall",pos:"Outfield",cap:false,squad:""},
+{id:66,name:"Bruce Forster",shirt:"14",area:"North West",club:"Crewe Vagrants",pos:"Outfield",cap:false,squad:""},
+{id:67,name:"Simon Darlington",shirt:"15",area:"North West",club:"Macclesfield",pos:"Outfield",cap:false,squad:""},
+{id:68,name:"James Ballinger",shirt:"16",area:"North West",club:"Didsbury Northern",pos:"Outfield",cap:false,squad:""},
+{id:69,name:"Crayton Napoleon",shirt:"17",area:"North West",club:"Leyland Chorley",pos:"Outfield",cap:false,squad:""},
+{id:70,name:"Brandon Fernandez",shirt:"18",area:"North West",club:"Didsbury Northern",pos:"Outfield",cap:false,squad:""},
+{id:71,name:"Giles Dakin",shirt:"GK",area:"South East",club:"East Grinstead",pos:"GK",cap:false,squad:""},
+{id:72,name:"James Marshall",shirt:"GK",area:"South East",club:"Guildford",pos:"GK",cap:false,squad:""},
+{id:73,name:"Miken Amin",shirt:"3",area:"South East",club:"Oxted",pos:"Outfield",cap:false,squad:"som"},
+{id:74,name:"Keith Balmer",shirt:"4",area:"South East",club:"Sevenoaks",pos:"Outfield",cap:false,squad:""},
+{id:75,name:"John Boydell",shirt:"5",area:"South East",club:"Canterbury",pos:"Outfield",cap:false,squad:""},
+{id:76,name:"Iain Burwood",shirt:"6",area:"South East",club:"Sittingbourne",pos:"Outfield",cap:false,squad:""},
+{id:77,name:"Paul Cook",shirt:"7",area:"South East",club:"K Sports",pos:"Outfield",cap:false,squad:""},
+{id:78,name:"Tom Fewster",shirt:"8",area:"South East",club:"Lewes",pos:"Outfield",cap:false,squad:""},
+{id:79,name:"Damon Garwood",shirt:"9",area:"South East",club:"Old Georgians",pos:"Outfield",cap:false,squad:"main"},
+{id:80,name:"Jordan Hallows",shirt:"10",area:"South East",club:"Old Georgians",pos:"Outfield",cap:false,squad:"som"},
+{id:81,name:"Jamie Hutchin",shirt:"11",area:"South East",club:"Woking",pos:"Outfield",cap:false,squad:""},
+{id:82,name:"Noel Lander",shirt:"12",area:"South East",club:"Gore Court",pos:"Outfield",cap:false,squad:""},
+{id:83,name:"Barry Mackness",shirt:"13",area:"South East",club:"Old Williamsons",pos:"Outfield",cap:false,squad:""},
+{id:84,name:"Lewis Mitchell",shirt:"14",area:"South East",club:"Sutton Valence",pos:"Outfield",cap:false,squad:""},
+{id:85,name:"Phil Morrison",shirt:"15",area:"South East",club:"Maidstone",pos:"Outfield",cap:false,squad:""},
+{id:86,name:"Liam Russell",shirt:"16",area:"South East",club:"Lewes",pos:"Outfield",cap:false,squad:""},
+{id:87,name:"Chris Schollick",shirt:"17",area:"South East",club:"Woking",pos:"Outfield",cap:false,squad:""},
+{id:88,name:"John Sullivan",shirt:"18",area:"South East",club:"Marden Russets",pos:"Outfield",cap:false,squad:""},
+{id:89,name:"Stephen Cole",shirt:"GK1",area:"South Central",club:"Trojans",pos:"GK",cap:false,squad:""},
+{id:90,name:"Simon Howells",shirt:"GK23",area:"South Central",club:"Witney",pos:"GK",cap:false,squad:""},
+{id:91,name:"Jon Weait",shirt:"2",area:"South Central",club:"Haslemere",pos:"Outfield",cap:false,squad:"main"},
+{id:92,name:"Jon Bishop",shirt:"3",area:"South Central",club:"Reading",pos:"Outfield",cap:false,squad:""},
+{id:93,name:"Ian Cheshire",shirt:"4",area:"South Central",club:"Portsmouth",pos:"Outfield",cap:false,squad:""},
+{id:94,name:"Duncan Marsh",shirt:"5",area:"South Central",club:"Bournemouth",pos:"Outfield",cap:false,squad:""},
+{id:95,name:"Dan Bleach",shirt:"6",area:"South Central",club:"Oxford OBU",pos:"Outfield",cap:false,squad:"som"},
+{id:96,name:"Greg Smith",shirt:"7",area:"South Central",club:"Basingstoke",pos:"Outfield",cap:false,squad:""},
+{id:97,name:"Tom Boswell",shirt:"8",area:"South Central",club:"Portsmouth",pos:"Outfield",cap:false,squad:""},
+{id:98,name:"Chris Butler",shirt:"9",area:"South Central",club:"Portsmouth",pos:"Outfield",cap:false,squad:"som"},
+{id:99,name:"Karam Bolina",shirt:"10",area:"South Central",club:"Trojans",pos:"Outfield",cap:false,squad:""},
+{id:100,name:"Ben Shaughnessy",shirt:"11",area:"South Central",club:"Winchester",pos:"Outfield",cap:true,capType:"C",squad:""},
+{id:101,name:"Charlie Walker",shirt:"12",area:"South Central",club:"Witney",pos:"Outfield",cap:false,squad:""},
+{id:102,name:"Stephen Hulme",shirt:"13",area:"South Central",club:"Petersfield",pos:"Outfield",cap:false,squad:""},
+{id:103,name:"Peter Wiles",shirt:"14",area:"South Central",club:"Portsmouth",pos:"Outfield",cap:false,squad:""},
+{id:104,name:"Colin French",shirt:"16",area:"South Central",club:"Winchester",pos:"Outfield",cap:false,squad:""},
+{id:105,name:"Justin Peel",shirt:"22",area:"South Central",club:"Witney",pos:"Outfield",cap:false,squad:""},
+{id:106,name:"Simon Roberts",shirt:"26",area:"South Central",club:"Marlow",pos:"Outfield",cap:false,squad:""},
+{id:107,name:"Martin Lawrence",shirt:"GK",area:"West",club:"Taunton Vale",pos:"GK",cap:false,squad:""},
+{id:108,name:"Nev Stanton",shirt:"GK",area:"West",club:"Ocean City",pos:"GK",cap:false,squad:""},
+{id:109,name:"Marcus Haes",shirt:"2",area:"West",club:"Truro",pos:"Outfield",cap:false,squad:""},
+{id:110,name:"Jon Hooker",shirt:"4",area:"West",club:"Corsham",pos:"Outfield",cap:false,squad:""},
+{id:111,name:"James Hills",shirt:"5",area:"West",club:"City of Bath",pos:"Outfield",cap:true,capType:"C",squad:""},
+{id:112,name:"Matthew Elloway",shirt:"6",area:"West",club:"Shepton Mallet",pos:"Outfield",cap:false,squad:""},
+{id:113,name:"Tim Jones",shirt:"7",area:"West",club:"Whitchurch",pos:"Outfield",cap:false,squad:""},
+{id:114,name:"Chris Hancock",shirt:"8",area:"West",club:"Team Bath Buccaneers",pos:"Outfield",cap:false,squad:""},
+{id:115,name:"Will Hodge",shirt:"9",area:"West",club:"Marlborough",pos:"Outfield",cap:false,squad:""},
+{id:116,name:"Jamie Gowland",shirt:"10",area:"West",club:"City of Bath",pos:"Outfield",cap:false,squad:"som"},
+{id:117,name:"Simon Padley",shirt:"11",area:"West",club:"Cheltenham",pos:"Outfield",cap:false,squad:""},
+{id:118,name:"Duncan Edwards",shirt:"13",area:"West",club:"Keynsham",pos:"Outfield",cap:false,squad:"som"},
+{id:119,name:"Bradley Alwan-Arab",shirt:"14",area:"West",club:"Clifton Robinsons",pos:"Outfield",cap:false,squad:""},
+{id:120,name:"Stuart Johnson",shirt:"15",area:"West",club:"Taunton Vale",pos:"Outfield",cap:false,squad:""},
+{id:121,name:"Richard McCollum",shirt:"17",area:"West",club:"Isca",pos:"Outfield",cap:false,squad:""},
+{id:122,name:"David House",shirt:"18",area:"West",club:"Taunton Vale",pos:"Outfield",cap:false,squad:"som"},
+{id:123,name:"Alex Hay",shirt:"19",area:"West",club:"Cheltenham",pos:"Outfield",cap:false,squad:"main"},
+{id:124,name:"Max Chippett",shirt:"21",area:"West",club:"Duchy",pos:"Outfield",cap:false,squad:""},
+{id:125,name:"David Snell",shirt:"GK",area:"Yorkshire & NE",club:"Ben Rhydding",pos:"GK",cap:false,squad:""},
+{id:126,name:"Dan Wall",shirt:"GK",area:"Yorkshire & NE",club:"City of York",pos:"GK",cap:false,squad:""},
+{id:127,name:"Richard Chandler",shirt:"2",area:"Yorkshire & NE",club:"City of York",pos:"Outfield",cap:false,squad:""},
+{id:128,name:"Daniel Foster",shirt:"3",area:"Yorkshire & NE",club:"Ben Rhydding",pos:"Outfield",cap:true,capType:"C",squad:"main"},
+{id:129,name:"Andrew Hill",shirt:"4",area:"Yorkshire & NE",club:"Leeds Adel",pos:"Outfield",cap:false,squad:""},
+{id:130,name:"James Robinson",shirt:"6",area:"Yorkshire & NE",club:"Leeds Adel",pos:"Outfield",cap:false,squad:""},
+{id:131,name:"Richard Partner",shirt:"7",area:"Yorkshire & NE",club:"Leeds Adel",pos:"Outfield",cap:false,squad:""},
+{id:132,name:"Sanjay Anand",shirt:"8",area:"Yorkshire & NE",club:"Huddersfield",pos:"Outfield",cap:false,squad:""},
+{id:133,name:"Dave Navin",shirt:"9",area:"Yorkshire & NE",club:"City of York",pos:"Outfield",cap:false,squad:""},
+{id:134,name:"Dan Pudwell",shirt:"10",area:"Yorkshire & NE",club:"Durham City",pos:"Outfield",cap:false,squad:""},
+{id:135,name:"Ian McClive",shirt:"11",area:"Yorkshire & NE",club:"Ben Rhydding",pos:"Outfield",cap:false,squad:""},
+{id:136,name:"Dave Rogers",shirt:"13",area:"Yorkshire & NE",club:"City of York",pos:"Outfield",cap:false,squad:""},
+{id:137,name:"Damien Greig",shirt:"15",area:"Yorkshire & NE",club:"Wakefield",pos:"Outfield",cap:false,squad:""},
+{id:138,name:"Rob Kelly",shirt:"17",area:"Yorkshire & NE",club:"Huddersfield",pos:"Outfield",cap:false,squad:""},
+{id:139,name:"Glyn Summerhayes",shirt:"18",area:"Yorkshire & NE",club:"Durham City",pos:"Outfield",cap:false,squad:""},
+{id:140,name:"James Heslip",shirt:"19",area:"Yorkshire & NE",club:"Leeds Adel",pos:"Outfield",cap:false,squad:""},
+{id:141,name:"Kasim Mughal",shirt:"20",area:"Yorkshire & NE",club:"Huddersfield",pos:"Outfield",cap:false,squad:""},
+{id:142,name:"Gary Grant",shirt:"21",area:"Yorkshire & NE",club:"Gateshead",pos:"Outfield",cap:false,squad:""},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let A = {}; // assessments cache: player_id -> {technical,tactical,physical,attitude,notes,decision}
+let cArea='ALL', cDec='ALL_D', cPos='ALL_P', cSquad='ALL_S', cView='grid', sT='', fixF=null;
+let saveTimers = {}; // debounce timers per player
+let pollTimer = null;
+let lastPollTime = 0;
+
+// ── SUPABASE API ──────────────────────────────────────────────────────────────
+const hdrs = {
+  'apikey': SB_KEY,
+  'Authorization': `Bearer ${SB_KEY}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=minimal'
+};
+
+async function sbFetch(path, opts={}) {
+  const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: hdrs, ...opts
+  });
+  return r;
+}
+
+async function loadAll() {
+  try {
+    setSyncState('syncing');
+    const r = await sbFetch('assessments?select=*');
+    if (!r.ok) throw new Error('Load failed');
+    const rows = await r.json();
+    rows.forEach(row => {
+      A[row.player_id] = {
+        technical: row.technical||0, tactical: row.tactical||0,
+        physical: row.physical||0, attitude: row.attitude||0,
+        notes: row.notes||'', decision: row.decision||''
+      };
+    });
+    setSyncState('live');
+    return true;
+  } catch(e) {
+    setSyncState('error');
+    return false;
+  }
+}
+
+async function savePlayer(id) {
+  const s = gs(id);
+  setSyncState('syncing');
+  // Show saving indicator on card
+  document.querySelectorAll(`.csync-${id}`).forEach(el => { el.className=`card-sync csync-${id} saving`; });
+  try {
+    const r = await sbFetch(
+      `assessments?player_id=eq.${id}`,
+      {
+        method: 'PATCH',
+        headers: {...hdrs, 'Prefer': 'return=minimal'},
+        body: JSON.stringify({
+          technical: s.technical, tactical: s.tactical,
+          physical: s.physical, attitude: s.attitude,
+          notes: s.notes, decision: s.decision,
+          updated_at: new Date().toISOString()
+        })
+      }
+    );
+    // If no row exists yet, insert
+    if (r.status === 404 || r.headers.get('content-range') === '*/0') {
+      await sbFetch('assessments', {
+        method: 'POST',
+        headers: {...hdrs, 'Prefer': 'return=minimal'},
+        body: JSON.stringify({
+          player_id: id,
+          technical: s.technical, tactical: s.tactical,
+          physical: s.physical, attitude: s.attitude,
+          notes: s.notes, decision: s.decision
+        })
+      });
+    }
+    // Check if we need to upsert (PATCH returns 0 rows if player not in DB)
+    const ct = r.headers.get('content-range');
+    if (ct === '*/0' || r.status === 200) {
+      // might need upsert
+    }
+    setSyncState('live');
+    setTimeout(() => {
+      document.querySelectorAll(`.csync-${id}`).forEach(el => { el.className=`card-sync csync-${id} saved`; });
+      setTimeout(() => { document.querySelectorAll(`.csync-${id}`).forEach(el => { el.className=`card-sync csync-${id}`; }); }, 1500);
+    }, 300);
+  } catch(e) {
+    setSyncState('error');
+    document.querySelectorAll(`.csync-${id}`).forEach(el => { el.className=`card-sync csync-${id} error`; });
+  }
+}
+
+async function upsertPlayer(id) {
+  const s = gs(id);
+  setSyncState('syncing');
+  try {
+    await sbFetch('assessments', {
+      method: 'POST',
+      headers: {...hdrs, 'Prefer': 'resolution=merge-duplicates,return=minimal'},
+      body: JSON.stringify({
+        player_id: id,
+        technical: s.technical, tactical: s.tactical,
+        physical: s.physical, attitude: s.attitude,
+        notes: s.notes, decision: s.decision,
+        updated_at: new Date().toISOString()
+      })
+    });
+    setSyncState('live');
+    document.querySelectorAll(`.csync-${id}`).forEach(el => {
+      el.className=`card-sync csync-${id} saved`;
+      setTimeout(()=>{ el.className=`card-sync csync-${id}`; }, 1500);
+    });
+  } catch(e) { setSyncState('error'); }
+}
+
+// Poll for remote changes every N seconds
+async function pollRemote() {
+  try {
+    const r = await sbFetch(`assessments?updated_at=gt.${new Date(lastPollTime-1000).toISOString()}&select=*`);
+    if (!r.ok) return;
+    const rows = await r.json();
+    let changed = false;
+    rows.forEach(row => {
+      const current = A[row.player_id];
+      const newData = {
+        technical:row.technical||0, tactical:row.tactical||0,
+        physical:row.physical||0, attitude:row.attitude||0,
+        notes:row.notes||'', decision:row.decision||''
+      };
+      // Only update if different (avoid overwriting local edits in flight)
+      if (!current ||
+          current.technical!==newData.technical || current.tactical!==newData.tactical ||
+          current.physical!==newData.physical || current.attitude!==newData.attitude ||
+          current.notes!==newData.notes || current.decision!==newData.decision) {
+        A[row.player_id] = newData;
+        changed = true;
+        // Refresh just that player's card/row in place
+        refreshPlayerUI(row.player_id);
+      }
+    });
+    if (changed) updateCounts();
+    lastPollTime = Date.now();
+  } catch(e) {}
+}
+
+function startPolling() {
+  lastPollTime = Date.now();
+  pollTimer = setInterval(pollRemote, POLL_INTERVAL);
+}
+
+// ── SYNC UI ───────────────────────────────────────────────────────────────────
+function setSyncState(state) {
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  const bar = document.getElementById('syncBar');
+  dot.className = 'sync-dot ' + state;
+  bar.className = state === 'syncing' ? 'syncing' : state === 'error' ? 'error' : '';
+  lbl.textContent = state==='live'?'Live':state==='syncing'?'Syncing…':'Offline';
+}
+
+// ── LOCAL STATE ───────────────────────────────────────────────────────────────
+function gs(id) {
+  if (!A[id]) A[id] = {technical:0,tactical:0,physical:0,attitude:0,notes:'',decision:''};
+  return A[id];
+}
+function avg(id) {
+  const s=gs(id), sc=[s.technical,s.tactical,s.physical,s.attitude].filter(x=>x>0);
+  return sc.length ? sc.reduce((a,b)=>a+b,0)/sc.length : 0;
+}
+
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+function setArea(a) { cArea=a; document.querySelectorAll('[data-area]').forEach(b=>b.classList.toggle('active',b.dataset.area===a)); closeSidebar(); render(); }
+function setDecFilter(d) { cDec=d; document.querySelectorAll('[data-dec]').forEach(b=>b.classList.toggle('active',b.dataset.dec===d)); closeSidebar(); render(); }
+function setPosFilter(p) { cPos=p; document.querySelectorAll('[data-pos]').forEach(b=>b.classList.toggle('active',b.dataset.pos===p)); closeSidebar(); render(); }
+function setSquadFilter(s) { cSquad=s; document.querySelectorAll('[data-squad]').forEach(b=>b.classList.toggle('active',b.dataset.squad===s)); closeSidebar(); render(); }
+
+function setView(v) {
+  cView=v;
+  document.querySelectorAll('.view-tab').forEach((b,i)=>b.classList.toggle('active',['grid','list','schedule','summary'][i]===v));
+  const map={grid:'grid',list:'flex',schedule:'block',summary:'block'};
+  ['gridView','listView','scheduleView','summaryView'].forEach(id=>{document.getElementById(id).style.display='none';});
+  document.getElementById(v+'View').style.display=map[v]||'block';
+  render();
+}
+
+document.getElementById('searchInput').addEventListener('input', e=>{ sT=e.target.value; render(); });
+
+function fp() {
+  return rawPlayers.filter(p => {
+    if (fixF && p.area!==fixF.home && p.area!==fixF.away) return false;
+    if (!fixF && cArea!=='ALL' && p.area!==cArea) return false;
+    if (cPos==='GK' && p.pos!=='GK') return false;
+    if (cPos==='Outfield' && p.pos!=='Outfield') return false;
+    if (cSquad!=='ALL_S' && cSquad!=='none' && p.squad!==cSquad) return false;
+    if (cSquad==='none' && p.squad!=='') return false;
+    const s=gs(p.id);
+    if (cDec==='recommended' && s.decision!=='recommended') return false;
+    if (cDec==='monitor' && s.decision!=='monitor') return false;
+    if (cDec==='not-selected' && s.decision!=='not-selected') return false;
+    if (cDec==='unseen' && s.decision!=='') return false;
+    if (sT) { const q=sT.toLowerCase(); if(!p.name.toLowerCase().includes(q)&&!p.club.toLowerCase().includes(q)&&!p.area.toLowerCase().includes(q)) return false; }
+    return true;
+  });
+}
+
+// ── SIDEBAR TOGGLE ────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  const open=sb.classList.toggle('open');
+  ov.classList.toggle('show', open);
+}
+function closeSidebar() {
+  if(window.innerWidth < 900) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  }
+}
+
+// ── STARS ─────────────────────────────────────────────────────────────────────
+function svgStar(f) {
+  const c = f?'#C8102E':'#e0e0e0';
+  return `<svg viewBox="0 0 20 20" fill="${c}"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
+}
+function starsH(id, f, v) {
+  return Array.from({length:5},(_,i)=>`<span class="star" onclick="setR(${id},'${f}',${i+1})">${svgStar(i<v)}</span>`).join('');
+}
+
+function setR(id, f, v) {
+  const s=gs(id); s[f]=s[f]===v?0:v;
+  document.querySelectorAll(`[data-stars="${id}-${f}"]`).forEach(el=>el.innerHTML=starsH(id,f,s[f]));
+  debounceUpsert(id);
+  updateCounts();
+}
+
+function setD(id, dec) {
+  const s=gs(id); s.decision=s.decision===dec?'':dec;
+  // Update all UI elements for this player
+  document.querySelectorAll(`[data-pid="${id}"]`).forEach(el=>{
+    el.className=el.className.replace(/\b(recommended|monitor|not-selected)\b/g,'').trim();
+    if(s.decision) el.classList.add(s.decision);
+  });
+  document.querySelectorAll(`.strip-${id}`).forEach(el=>{
+    el.className=`card-strip strip-${id}${s.decision?' '+s.decision:''}`;
+    const p=rawPlayers.find(x=>x.id===id);
+    el.style.background=s.decision?'':AC[p.area]||'#ccc';
+  });
+  document.querySelectorAll(`[data-did="${id}"]`).forEach(b=>b.classList.toggle('active',b.dataset.dtype===s.decision));
+  debounceUpsert(id);
+  updateCounts();
+  if(cDec!=='ALL_D') render();
+}
+
+function sN(id, v) {
+  gs(id).notes=v;
+  debounceUpsert(id);
+}
+
+function debounceUpsert(id) {
+  clearTimeout(saveTimers[id]);
+  saveTimers[id] = setTimeout(() => upsertPlayer(id), 800);
+}
+
+// ── REFRESH SINGLE PLAYER UI (for remote updates) ─────────────────────────────
+function refreshPlayerUI(id) {
+  const s = gs(id);
+  const p = rawPlayers.find(x=>x.id===id);
+  if (!p) return;
+  // Update stars
+  ['technical','tactical','physical','attitude'].forEach(f => {
+    document.querySelectorAll(`[data-stars="${id}-${f}"]`).forEach(el=>el.innerHTML=starsH(id,f,s[f]));
+  });
+  // Update decision buttons
+  document.querySelectorAll(`[data-did="${id}"]`).forEach(b=>b.classList.toggle('active',b.dataset.dtype===s.decision));
+  // Update card class
+  document.querySelectorAll(`[data-pid="${id}"]`).forEach(el=>{
+    el.className=el.className.replace(/\b(recommended|monitor|not-selected)\b/g,'').trim();
+    if(s.decision) el.classList.add(s.decision);
+  });
+  // Update strip
+  document.querySelectorAll(`.strip-${id}`).forEach(el=>{
+    el.className=`card-strip strip-${id}${s.decision?' '+s.decision:''}`;
+    el.style.background=s.decision?'':AC[p.area]||'#ccc';
+  });
+  // Update notes (only if textarea not focused)
+  document.querySelectorAll(`.notes-${id}`).forEach(el=>{
+    if(document.activeElement!==el) el.value=s.notes;
+  });
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function sqB(sq) {
+  if(!sq)return'';
+  const L={'main':'Main Squad','main-ntr':'Main NTR','som':'SOM','som-ntr':'SOM NTR'};
+  return `<span class="sq-badge ${sq}">${L[sq]}</span>`;
+}
+function areaTag(area) {
+  const lk=LIGHT_KITS.includes(area);
+  return `<span class="tag tag-area${lk?' light':''}" style="background:${AC[area]||'#999'}">${area}</span>`;
+}
+
+// ── RENDER GRID ───────────────────────────────────────────────────────────────
+function renderGrid(pl) {
+  const el=document.getElementById('gridView'); el.innerHTML='';
+  if(!pl.length){el.innerHTML='<div class="empty"><h3>No players match</h3><p>Adjust filters or search.</p></div>';return;}
+  pl.forEach(p=>{
+    const s=gs(p.id), ac=AC[p.area]||'#ccc';
+    const d=document.createElement('div');
+    d.className=`player-card${s.decision?' '+s.decision:''}`;
+    d.setAttribute('data-pid',p.id);
+    d.innerHTML=`
+      <div class="card-strip strip-${p.id}${s.decision?' '+s.decision:''}" style="${!s.decision?'background:'+ac:''}"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="card-name">${p.name}</div>
+            <div class="card-club">${p.club}</div>
+          </div>
+          <div class="card-num">${p.shirt}</div>
+        </div>
+        <div class="card-tags">
+          ${areaTag(p.area)}
+          <span class="tag ${p.pos==='GK'?'tag-gk':'tag-out'}">${p.pos}</span>
+          ${p.cap?`<span class="tag tag-cap">★ ${p.capType}</span>`:''}
+          ${sqB(p.squad)}
+        </div>
+        <div class="ratings-grid">
+          <div class="rating-item"><label>Technical</label><div class="stars" data-stars="${p.id}-technical">${starsH(p.id,'technical',s.technical)}</div></div>
+          <div class="rating-item"><label>Tactical</label><div class="stars" data-stars="${p.id}-tactical">${starsH(p.id,'tactical',s.tactical)}</div></div>
+          <div class="rating-item"><label>Physical</label><div class="stars" data-stars="${p.id}-physical">${starsH(p.id,'physical',s.physical)}</div></div>
+          <div class="rating-item"><label>Attitude</label><div class="stars" data-stars="${p.id}-attitude">${starsH(p.id,'attitude',s.attitude)}</div></div>
+        </div>
+        <textarea class="notes-field notes-${p.id}" placeholder="Scouting notes…" oninput="sN(${p.id},this.value)">${s.notes}</textarea>
+        <div class="dec-row">
+          <button class="dec-btn recommend${s.decision==='recommended'?' active':''}" data-did="${p.id}" data-dtype="recommended" onclick="setD(${p.id},'recommended')">✓ Trials</button>
+          <button class="dec-btn monitor${s.decision==='monitor'?' active':''}" data-did="${p.id}" data-dtype="monitor" onclick="setD(${p.id},'monitor')">⚡ Monitor</button>
+          <button class="dec-btn reject${s.decision==='not-selected'?' active':''}" data-did="${p.id}" data-dtype="not-selected" onclick="setD(${p.id},'not-selected')">✗ Pass</button>
+        </div>
+      </div>
+      <div class="card-sync csync-${p.id}"></div>`;
+    el.appendChild(d);
+  });
+}
+
+// ── RENDER LIST ───────────────────────────────────────────────────────────────
+function renderList(pl) {
+  const el=document.getElementById('listView'); el.innerHTML='';
+  const hdr=document.createElement('div'); hdr.className='list-hdr';
+  hdr.innerHTML='<span>#</span><span>Player</span><span class="list-hide">Area</span><span class="list-hide">Pos</span><span>Rating</span><span class="list-hide">Notes</span><span>Decision</span>';
+  el.appendChild(hdr);
+  if(!pl.length){const e=document.createElement('div');e.className='empty';e.style.padding='30px';e.textContent='No players match.';el.appendChild(e);return;}
+  pl.forEach(p=>{
+    const s=gs(p.id), av=avg(p.id), ac=AC[p.area]||'#ccc';
+    const r=document.createElement('div');
+    r.className=`list-row${s.decision?' '+s.decision:''}`;
+    r.style.setProperty('--lc', ac);
+    r.setAttribute('data-pid',p.id);
+    const ms=Array.from({length:5},(_,i)=>`<span style="color:${i<Math.round(av)?'#C8102E':'#ddd'}">${i<Math.round(av)?'★':'☆'}</span>`).join('');
+    r.innerHTML=`
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#aaa;font-size:13px">${p.shirt}</div>
+      <div><div class="list-name">${p.name} ${sqB(p.squad)}</div>${p.cap?`<span style="font-size:9px;color:#b8860b">★ ${p.capType}</span>`:''}</div>
+      <div class="list-hide">${areaTag(p.area)}<div style="font-size:10px;color:#888;margin-top:3px">${p.club}</div></div>
+      <div class="list-hide"><span class="tag ${p.pos==='GK'?'tag-gk':'tag-out'}" style="font-size:9px">${p.pos}</span></div>
+      <div class="mini-stars">${av>0?ms:'<span style="color:#ddd">—</span>'}</div>
+      <div class="list-hide" style="font-size:10px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.notes||'—'}</div>
+      <div class="ldec-row">
+        <button class="ldec recommend${s.decision==='recommended'?' active':''}" data-did="${p.id}" data-dtype="recommended" onclick="setD(${p.id},'recommended')">Trial</button>
+        <button class="ldec monitor${s.decision==='monitor'?' active':''}" data-did="${p.id}" data-dtype="monitor" onclick="setD(${p.id},'monitor')">Mon</button>
+        <button class="ldec reject${s.decision==='not-selected'?' active':''}" data-did="${p.id}" data-dtype="not-selected" onclick="setD(${p.id},'not-selected')">Pass</button>
+      </div>`;
+    el.appendChild(r);
+  });
+}
+
+// ── RENDER SCHEDULE ───────────────────────────────────────────────────────────
+function renderSchedule() {
+  const el=document.getElementById('scheduleView'); el.innerHTML='';
+  if(fixF){
+    const b=document.createElement('div'); b.className='fix-banner';
+    b.innerHTML=`Showing: <strong>${fixF.home}</strong> vs <strong>${fixF.away}</strong> — go to Grid or List to assess <button class="fix-clear" onclick="clearFix()">✕ Clear</button>`;
+    el.appendChild(b);
+  }
+  ['saturday','sunday'].forEach(day=>{
+    const sec=document.createElement('div'); sec.className='sched-day';
+    const hdr=document.createElement('div'); hdr.className='sched-hdr';
+    hdr.innerHTML=`${day==='saturday'?'Saturday 16 May':'Sunday 17 May'} <span>17.5 mins each way</span>`;
+    sec.appendChild(hdr);
+    const grid=document.createElement('div'); grid.className='sched-grid';
+    const l1=document.createElement('div'); l1.className='pitch-lbl'; l1.textContent='Stirratt Pitch';
+    const l2=document.createElement('div'); l2.className='pitch-lbl'; l2.textContent='BGS Pitch';
+    grid.appendChild(l1); grid.appendChild(l2);
+    const times=[...new Set(SCHED[day].map(g=>g.time))];
+    times.forEach(t=>{
+      ['Stirratt','BGS'].forEach(pitch=>{
+        const g=SCHED[day].find(x=>x.time===t&&x.pitch===pitch);
+        if(!g){const e=document.createElement('div');grid.appendChild(e);return;}
+        const isAct=fixF&&((fixF.home===g.home&&fixF.away===g.away)||(fixF.home===g.away&&fixF.away===g.home));
+        const f=document.createElement('div'); f.className=`fixture${isAct?' active-game':''}`;
+        const hc=AC[g.home]||'#ccc', awc=AC[g.away]||'#ccc';
+        f.innerHTML=`
+          <div class="fix-time">${g.time}</div>
+          <div class="fix-teams">
+            <div class="fix-match">
+              <div class="fix-team"><div class="kit-sw" style="background:${hc}"></div>${g.home}</div>
+              <div class="fix-vs">v</div>
+              <div class="fix-team"><div class="kit-sw" style="background:${awc}"></div>${g.away}</div>
+            </div>
+            <div class="fix-pitch">${g.pitch} Pitch</div>
+          </div>
+          <button class="fix-btn${isAct?' active-btn':''}" onclick="filterFix('${g.home}','${g.away}')">${isAct?'✓ Active':'Scout'}</button>`;
+        grid.appendChild(f);
+      });
+    });
+    sec.appendChild(grid); el.appendChild(sec);
+  });
+}
+function filterFix(h,a){fixF=(fixF&&fixF.home===h&&fixF.away===a)?null:{home:h,away:a};setView('grid');}
+function clearFix(){fixF=null;render();}
+
+// ── RENDER SUMMARY ────────────────────────────────────────────────────────────
+function renderSummary() {
+  const el=document.getElementById('summaryView'); el.innerHTML='';
+  const recs=rawPlayers.filter(p=>gs(p.id).decision==='recommended');
+  const mons=rawPlayers.filter(p=>gs(p.id).decision==='monitor');
+  const rejects=rawPlayers.filter(p=>gs(p.id).decision==='not-selected');
+  const sbs=arr=>[...arr].sort((a,b)=>avg(b.id)-avg(a.id));
+  el.innerHTML=`<div class="sum-stats">
+    <div class="sum-stat tot"><div class="sum-num">${rawPlayers.length}</div><div class="sum-lbl">Total</div></div>
+    <div class="sum-stat rec"><div class="sum-num">${recs.length}</div><div class="sum-lbl">Trials</div></div>
+    <div class="sum-stat mon"><div class="sum-num">${mons.length}</div><div class="sum-lbl">Monitor</div></div>
+    <div class="sum-stat rej"><div class="sum-num">${rejects.length}</div><div class="sum-lbl">Passed</div></div>
+  </div>`;
+  function pRow(p,cls){
+    const s=gs(p.id),av=avg(p.id);
+    const sc=av>=4?'hi':av>=2.5?'mid':'';
+    return `<div class="sum-row ${cls}">
+      <div class="sum-row-name">${p.name} ${sqB(p.squad)}</div>
+      <div class="sum-hide">${areaTag(p.area)}</div>
+      <div class="sum-hide" style="font-size:10px;color:#888">${p.pos}${p.cap?' · '+p.capType:''}</div>
+      <div class="sum-score ${sc}">${av>0?av.toFixed(1):'—'}</div>
+      <div class="sum-notes sum-hide">${s.notes||'No notes'}</div>
+    </div>`;
+  }
+  if(recs.length) el.innerHTML+=`<div class="sum-sec-hdr rh">✅ Recommended for Trials (${recs.length})</div><div class="sum-rows">${sbs(recs).map(p=>pRow(p,'rec')).join('')}</div>`;
+  else el.innerHTML+=`<div class="sum-sec-hdr" style="color:#aaa">No players recommended yet</div>`;
+  if(mons.length) el.innerHTML+=`<div class="sum-sec-hdr mh">⚡ Monitor List (${mons.length})</div><div class="sum-rows">${sbs(mons).map(p=>pRow(p,'mon')).join('')}</div>`;
+  if(recs.length||mons.length) el.innerHTML+=`<button class="export-btn" onclick="expCSV()">📥 Export Shortlist CSV</button>`;
+}
+
+// ── COUNTS ────────────────────────────────────────────────────────────────────
+function updateCounts() {
+  const recs=rawPlayers.filter(p=>gs(p.id).decision==='recommended').length;
+  const mons=rawPlayers.filter(p=>gs(p.id).decision==='monitor').length;
+  document.getElementById('recCount').textContent=recs;
+  document.getElementById('monCount').textContent=mons;
+  document.getElementById('cnt-REC').textContent=recs;
+  document.getElementById('cnt-MON').textContent=mons;
+  document.getElementById('cnt-REJ').textContent=rawPlayers.filter(p=>gs(p.id).decision==='not-selected').length;
+  document.getElementById('cnt-UN').textContent=rawPlayers.filter(p=>gs(p.id).decision==='').length;
+  document.getElementById('cnt-ALLD').textContent=rawPlayers.length;
+  document.getElementById('cnt-ALL').textContent=rawPlayers.length;
+  document.getElementById('cnt-SQ-ALL').textContent=rawPlayers.length;
+  document.getElementById('cnt-SQ-MAIN').textContent=rawPlayers.filter(p=>p.squad==='main').length;
+  document.getElementById('cnt-SQ-MAINNTR').textContent=rawPlayers.filter(p=>p.squad==='main-ntr').length;
+  document.getElementById('cnt-SQ-SOM').textContent=rawPlayers.filter(p=>p.squad==='som').length;
+  document.getElementById('cnt-SQ-SOMNTR').textContent=rawPlayers.filter(p=>p.squad==='som-ntr').length;
+  document.getElementById('cnt-SQ-NONE').textContent=rawPlayers.filter(p=>!p.squad).length;
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function expCSV() {
+  const rows=[['Name','Club','Area','Position','Captain','Squad','Technical','Tactical','Physical','Attitude','Overall','Decision','Notes']];
+  rawPlayers.filter(p=>['recommended','monitor'].includes(gs(p.id).decision)).forEach(p=>{
+    const s=gs(p.id),av=avg(p.id);
+    rows.push([p.name,p.club,p.area,p.pos,p.cap?p.capType:'',p.squad||'None',s.technical,s.tactical,s.physical,s.attitude,av>0?av.toFixed(2):'',s.decision==='recommended'?'Recommend for Trials':'Monitor',s.notes.replace(/"/g,'""')]);
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n')],{type:'text/csv'}));
+  a.download='england_o45m_shortlist_2026.csv'; a.click();
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────────────────
+function render() {
+  const pl=fp();
+  if(cView==='grid') renderGrid(pl);
+  else if(cView==='list') renderList(pl);
+  else if(cView==='schedule') renderSchedule();
+  else renderSummary();
+  updateCounts();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init() {
+  await loadAll();
+  updateCounts();
+  render();
+  document.getElementById('loadingOverlay').style.opacity='0';
+  setTimeout(()=>{ document.getElementById('loadingOverlay').style.display='none'; }, 400);
+  startPolling();
+}
+
+init();
+</script>
+</body>
+</html>
