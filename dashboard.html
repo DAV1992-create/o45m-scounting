@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="England Masters squad dashboard">
+<title>Squad dashboard · England Masters</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="dashboard.css">
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+</head>
+<body>
+
+<nav class="nav-top" aria-label="Main navigation">
+  <a class="nav-brand" href="dashboard.html">
+    <span class="nav-badge">EM</span>
+    <span class="nav-text">
+      <span class="nav-name" id="orgName">England Masters</span>
+      <span class="nav-sub" id="orgSub">Men O45s</span>
+    </span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link active" href="dashboard.html">Dashboard</a>
+    <a class="nav-link" href="dashboard.html">Squad</a>
+    <a class="nav-link" href="matchday.html">Matchday</a>
+    <a class="nav-link" href="stats.html">Stats</a>
+    <a class="nav-link" href="contacts.html">Contacts</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-sm" id="inviteBtn" type="button">Invite</button>
+    <button class="btn btn-sm" id="exportBtn" type="button">Export</button>
+    <button class="btn btn-primary btn-sm" id="addPlayerBtnTop" type="button">+ Add player</button>
+    <button class="btn btn-ghost btn-sm" id="signOutBtn" type="button" title="Sign out">⎋</button>
+  </div>
+</nav>
+
+<main class="page">
+
+  <header class="page-header">
+    <h1>Squad dashboard</h1>
+    <p class="text-secondary" id="seasonLabel">Season 2025–26</p>
+  </header>
+
+  <section class="grid-stats section-gap" aria-label="Squad summary">
+    <div class="stat-card">
+      <div class="stat-label">Squad size</div>
+      <div class="stat-value" style="color: var(--blue);" id="stat-squad-size">—</div>
+      <div class="stat-sub">total roster</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Main squad</div>
+      <div class="stat-value" style="color: var(--green);" id="stat-main">—</div>
+      <div class="stat-sub">confirmed available</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">NTR</div>
+      <div class="stat-value" style="color: var(--amber);" id="stat-ntr">—</div>
+      <div class="stat-sub">under review</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Next tournament</div>
+      <div class="stat-value" style="font-size: 16px; font-family: var(--font-display); line-height: 1.2;" id="nextTourneyName">—</div>
+      <div class="stat-sub" id="nextTourneyMeta">none scheduled</div>
+    </div>
+  </section>
+
+  <section class="panel-row">
+
+    <!-- LEFT: roster -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          Squad roster
+          <span class="badge badge-gray" id="roster-count">—</span>
+        </div>
+        <div class="roster-search">
+          <input type="search" id="rosterSearch" placeholder="Search name or club..." aria-label="Search roster">
+        </div>
+      </div>
+
+      <div class="roster-filters">
+        <div class="filter-row" id="filterPills">
+          <button class="filter-pill active" data-filter="all">All</button>
+          <button class="filter-pill" data-filter="main">Main squad</button>
+          <button class="filter-pill" data-filter="ntr">NTR</button>
+          <button class="filter-pill" data-filter="som">SOM</button>
+          <button class="filter-pill" data-filter="gk">Goalkeepers</button>
+          <button class="filter-pill" data-filter="def">Defenders</button>
+          <button class="filter-pill" data-filter="mid">Midfielders</button>
+          <button class="filter-pill" data-filter="fwd">Forwards</button>
+        </div>
+      </div>
+
+      <div id="playerList" role="list">
+        <div class="player-list-empty">Loading squad…</div>
+      </div>
+
+      <div class="add-player-bar">
+        <button class="btn btn-full" id="addPlayerBtnBottom" type="button">+ Add player</button>
+      </div>
+    </div>
+
+    <aside class="stack">
+
+      <!-- Upcoming tournaments -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Upcoming tournaments</div>
+        </div>
+        <div class="card-body" id="tournamentList">
+          <div class="text-secondary text-small">Loading…</div>
+        </div>
+        <div style="padding:0 16px 16px;">
+          <button class="btn btn-full" id="addTournamentBtn" type="button">+ Add tournament</button>
+        </div>
+      </div>
+
+      <!-- Area breakdown -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">Players by area</div></div>
+        <div class="card-body" id="areaList">
+          <div class="text-secondary text-small">Loading…</div>
+        </div>
+      </div>
+
+      <!-- Programme info -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">Programme</div></div>
+        <div class="card-body">
+          <div class="detail-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--border);">
+            <span class="text-small text-secondary">Invite code</span>
+            <span class="text-mono" id="inviteCode" style="font-weight:500;">—</span>
+          </div>
+          <div class="detail-row" style="display:flex;justify-content:space-between;padding:6px 0;">
+            <span class="text-small text-secondary">Age group</span>
+            <span class="text-small" id="ageGroup">—</span>
+          </div>
+          <button class="btn btn-full mt-12" id="copyInviteBtn" type="button">Copy invite code</button>
+        </div>
+      </div>
+
+    </aside>
+  </section>
+</main>
+
+<!-- Tabs -->
+<nav class="nav-tabs" aria-label="Mobile navigation">
+  <a class="tab-item active" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+  <a class="tab-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Squad</a>
+  <a class="tab-item" href="matchday.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Matchday</a>
+  <a class="tab-item" href="stats.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>Stats</a>
+  <a class="tab-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>More</a>
+</nav>
+
+<!-- Add player modal -->
+<div class="modal-overlay hidden" id="addPlayerModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add player</div>
+      <button class="btn btn-ghost btn-icon" type="button" id="closeAddModal">✕</button>
+    </div>
+    <form class="modal-body" id="addPlayerForm">
+      <div class="form-group">
+        <label class="form-label" for="np-name">Full name</label>
+        <input id="np-name" type="text" required>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="np-pos">Position</label>
+          <select id="np-pos" required>
+            <option value="GK">GK</option><option value="DEF">DEF</option><option value="MID">MID</option><option value="FWD">FWD</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="np-num">Shirt number</label>
+          <input id="np-num" type="number" min="1" max="99">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="np-club">Club</label>
+        <input id="np-club" type="text">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="np-area">Area</label>
+          <select id="np-area">
+            <option>East</option><option>London</option><option>Midlands</option><option>North West</option><option>South East</option><option>South Central</option><option>West</option><option>Yorkshire &amp; NE</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="np-status">Squad status</label>
+          <select id="np-status" required>
+            <option value="main">Main Squad</option>
+            <option value="ntr">NTR</option>
+            <option value="som">SOM</option>
+            <option value="som-ntr">SOM NTR</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="np-email">Email (optional)</label>
+        <input id="np-email" type="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="np-phone">Phone (optional)</label>
+        <input id="np-phone" type="tel">
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn" type="button" id="cancelAdd">Cancel</button>
+      <button class="btn btn-primary" type="submit" form="addPlayerForm">Save player</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add tournament modal -->
+<div class="modal-overlay hidden" id="addTournamentModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add tournament</div>
+      <button class="btn btn-ghost btn-icon" type="button" id="closeTourneyModal">✕</button>
+    </div>
+    <form class="modal-body" id="addTourneyForm">
+      <div class="form-group"><label class="form-label" for="nt-name">Name</label><input id="nt-name" type="text" required></div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label" for="nt-date">Date</label><input id="nt-date" type="date" required></div>
+        <div class="form-group">
+          <label class="form-label" for="nt-type">Type</label>
+          <select id="nt-type">
+            <option>International</option><option>Regional</option><option>Nationals</option><option>Friendly</option><option>Training Camp</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label" for="nt-venue">Venue</label><input id="nt-venue" type="text"></div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn" type="button" id="cancelTourney">Cancel</button>
+      <button class="btn btn-primary" type="submit" form="addTourneyForm">Save tournament</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let players = [];
+let tournaments = [];
+let orgInfo = null;
+let activeFilter = 'all';
+let searchQuery = '';
+
+const posClass = { GK:'avatar-gk', DEF:'avatar-def', MID:'avatar-mid', FWD:'avatar-fwd' };
+const statusBadge = {
+  main: '<span class="badge badge-main">Main squad</span>',
+  ntr:  '<span class="badge badge-ntr">NTR</span>',
+  som:  '<span class="badge badge-som">SOM</span>',
+  'som-ntr': '<span class="badge badge-som-ntr">SOM NTR</span>'
+};
+
+function initials(name) {
+  return name.split(/\s+/).map(s => s[0]).slice(0, 2).join('').toUpperCase();
+}
+function dotForStatus(s) { return s === 'main' ? 'green' : (s === 'ntr' || s === 'som-ntr') ? 'amber' : 'gray'; }
+
+async function loadAll() {
+  const ctx = await window.auth.requireAuth();
+  if (!ctx) return;
+  if (ctx.demo) {
+    document.getElementById('playerList').innerHTML = '<div class="player-list-empty">Configure Supabase to load real data.</div>';
+    return;
+  }
+  const supa = await window.sb();
+  orgInfo = await window.auth.getCurrentOrg();
+  if (orgInfo) {
+    document.getElementById('orgName').textContent = orgInfo.name;
+    document.getElementById('orgSub').textContent  = orgInfo.age_group || '';
+    document.getElementById('inviteCode').textContent = orgInfo.invite_code;
+    document.getElementById('ageGroup').textContent   = orgInfo.age_group || 'O45';
+    document.getElementById('seasonLabel').textContent = `${orgInfo.name} · Season 2025–26`;
+  }
+
+  // Load players for this org
+  const { data: playersData, error: pErr } = await supa.from('players')
+    .select('*')
+    .eq('org_id', ctx.orgId)
+    .order('shirt_number', { ascending: true, nullsFirst: false });
+  if (pErr) { console.error(pErr); }
+  players = playersData || [];
+
+  // Load tournaments
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: tData } = await supa.from('tournaments')
+    .select('*')
+    .eq('org_id', ctx.orgId)
+    .gte('date', today)
+    .order('date', { ascending: true })
+    .limit(5);
+  tournaments = tData || [];
+
+  renderPlayers();
+  renderTournaments();
+  renderAreas();
+}
+
+function renderPlayers() {
+  const list = document.getElementById('playerList');
+  const q = searchQuery.toLowerCase().trim();
+  const filtered = players.filter(p => {
+    const matchesSearch = !q || (p.name||'').toLowerCase().includes(q) || (p.club||'').toLowerCase().includes(q);
+    if (!matchesSearch) return false;
+    if (activeFilter === 'all') return true;
+    if (['gk','def','mid','fwd'].includes(activeFilter)) return (p.position||'').toLowerCase() === activeFilter;
+    return p.status === activeFilter || (activeFilter === 'som' && p.status === 'som-ntr');
+  });
+
+  if (players.length === 0) {
+    list.innerHTML = '<div class="player-list-empty">No players yet. Click <strong>+ Add player</strong> to get started.</div>';
+  } else if (filtered.length === 0) {
+    list.innerHTML = '<div class="player-list-empty">No players match your search.</div>';
+  } else {
+    list.innerHTML = filtered.map(p => {
+      const pos = p.position || '';
+      const init = p.initials || initials(p.name || '?');
+      return `
+        <a class="player-row" href="player.html?id=${p.id}" role="listitem">
+          <span class="avatar ${posClass[pos] || 'avatar-default'}">${init}</span>
+          <div class="player-info">
+            <div class="player-name">${p.name || '—'}</div>
+            <div class="player-club">${p.club || ''}${p.area ? ' · ' + p.area : ''}</div>
+          </div>
+          <span class="player-pos">${pos}</span>
+          <span class="player-num">${p.shirt_number ? '#' + p.shirt_number : ''}</span>
+          ${statusBadge[p.status] || ''}
+          <span class="dot dot-${dotForStatus(p.status)}" aria-hidden="true"></span>
+          <span class="player-chevron" aria-hidden="true">›</span>
+        </a>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('roster-count').textContent = `${players.length} player${players.length === 1 ? '' : 's'}`;
+  document.getElementById('stat-squad-size').textContent = players.length;
+  document.getElementById('stat-main').textContent = players.filter(p => p.status === 'main').length;
+  document.getElementById('stat-ntr').textContent  = players.filter(p => p.status === 'ntr' || p.status === 'som-ntr').length;
+}
+
+function renderTournaments() {
+  const wrap = document.getElementById('tournamentList');
+  if (tournaments.length === 0) {
+    wrap.innerHTML = '<div class="text-secondary text-small">No upcoming tournaments. Add one to get started.</div>';
+    document.getElementById('nextTourneyName').textContent = '—';
+    document.getElementById('nextTourneyMeta').textContent = 'none scheduled';
+    return;
+  }
+  const colorMap = { Nationals:'var(--blue)', Regional:'var(--green)', International:'var(--blue)', Friendly:'var(--amber)', 'Training Camp':'var(--amber)' };
+  wrap.innerHTML = tournaments.map(t => {
+    const d = new Date(t.date);
+    return `
+      <div class="tourney-item">
+        <span class="tourney-dot" style="background: ${colorMap[t.tournament_type] || 'var(--blue)'};"></span>
+        <div class="tourney-info">
+          <div class="tourney-name">${t.name}</div>
+          <div class="tourney-meta">${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${t.venue?' · '+t.venue:''}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  const next = tournaments[0];
+  document.getElementById('nextTourneyName').textContent = next.name;
+  const d = new Date(next.date);
+  document.getElementById('nextTourneyMeta').textContent = `${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${next.venue?' · '+next.venue:''}`;
+}
+
+function renderAreas() {
+  const wrap = document.getElementById('areaList');
+  if (players.length === 0) { wrap.innerHTML = '<div class="text-secondary text-small">Add players to see breakdown.</div>'; return; }
+  const counts = {};
+  players.forEach(p => { const a = p.area || 'Unknown'; counts[a] = (counts[a]||0) + 1; });
+  const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+  const max = sorted[0][1];
+  wrap.innerHTML = sorted.map(([area, count]) => `
+    <div class="area-bar">
+      <span class="area-name">${area}</span>
+      <div class="area-track"><div class="area-fill" style="width: ${(count/max)*100}%;"></div></div>
+      <span class="area-count">${count}</span>
+    </div>
+  `).join('');
+}
+
+/* Search + filter */
+document.getElementById('rosterSearch').addEventListener('input', e => { searchQuery = e.target.value; renderPlayers(); });
+document.getElementById('filterPills').addEventListener('click', e => {
+  const b = e.target.closest('.filter-pill'); if (!b) return;
+  document.querySelectorAll('#filterPills .filter-pill').forEach(p => p.classList.remove('active'));
+  b.classList.add('active');
+  activeFilter = b.dataset.filter; renderPlayers();
+});
+
+/* Add player modal */
+const modal = document.getElementById('addPlayerModal');
+document.getElementById('addPlayerBtnTop').addEventListener('click', () => modal.classList.remove('hidden'));
+document.getElementById('addPlayerBtnBottom').addEventListener('click', () => modal.classList.remove('hidden'));
+document.getElementById('closeAddModal').addEventListener('click', () => modal.classList.add('hidden'));
+document.getElementById('cancelAdd').addEventListener('click', () => modal.classList.add('hidden'));
+modal.addEventListener('click', e => { if (e.target === modal) modal.classList.add('hidden'); });
+
+document.getElementById('addPlayerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const ctx = await window.auth.requireAuth(); if (!ctx) return;
+  const supa = await window.sb();
+  const name = document.getElementById('np-name').value.trim();
+  if (!name) return;
+  const payload = {
+    org_id: ctx.orgId,
+    name,
+    initials: initials(name),
+    position: document.getElementById('np-pos').value,
+    shirt_number: parseInt(document.getElementById('np-num').value, 10) || null,
+    club: document.getElementById('np-club').value.trim() || null,
+    area: document.getElementById('np-area').value,
+    status: document.getElementById('np-status').value,
+    email: document.getElementById('np-email').value.trim() || null,
+    phone: document.getElementById('np-phone').value.trim() || null
+  };
+  const { error } = await supa.from('players').insert(payload);
+  if (error) { alert('Could not save: ' + error.message); return; }
+  document.getElementById('addPlayerForm').reset();
+  modal.classList.add('hidden');
+  await loadAll();
+});
+
+/* Add tournament modal */
+const tourneyModal = document.getElementById('addTournamentModal');
+document.getElementById('addTournamentBtn').addEventListener('click', () => tourneyModal.classList.remove('hidden'));
+document.getElementById('closeTourneyModal').addEventListener('click', () => tourneyModal.classList.add('hidden'));
+document.getElementById('cancelTourney').addEventListener('click', () => tourneyModal.classList.add('hidden'));
+tourneyModal.addEventListener('click', e => { if (e.target === tourneyModal) tourneyModal.classList.add('hidden'); });
+
+document.getElementById('addTourneyForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const ctx = await window.auth.requireAuth(); if (!ctx) return;
+  const supa = await window.sb();
+  const payload = {
+    org_id: ctx.orgId,
+    name: document.getElementById('nt-name').value.trim(),
+    date: document.getElementById('nt-date').value,
+    tournament_type: document.getElementById('nt-type').value,
+    venue: document.getElementById('nt-venue').value.trim() || null
+  };
+  if (!payload.name || !payload.date) return;
+  const { error } = await supa.from('tournaments').insert(payload);
+  if (error) { alert(error.message); return; }
+  document.getElementById('addTourneyForm').reset();
+  tourneyModal.classList.add('hidden');
+  await loadAll();
+});
+
+/* Copy invite code */
+document.getElementById('copyInviteBtn').addEventListener('click', async () => {
+  if (!orgInfo) return;
+  try {
+    await navigator.clipboard.writeText(orgInfo.invite_code);
+    alert('Invite code copied: ' + orgInfo.invite_code);
+  } catch {
+    prompt('Copy code:', orgInfo.invite_code);
+  }
+});
+
+document.getElementById('inviteBtn').addEventListener('click', () => {
+  if (!orgInfo) return;
+  alert(`Share this invite code with new coaches/staff:\n\n${orgInfo.invite_code}\n\nThey'll enter it on the login page when creating their account.`);
+});
+
+/* Export CSV */
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const headers = ['Name','Position','Number','Club','Area','Status','Phone','Email'];
+  const rows = players.map(p => [p.name, p.position, p.shirt_number, p.club, p.area, p.status, p.phone, p.email]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v||'').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${(orgInfo?.slug||'squad')}-roster.csv`; a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* Sign out */
+document.getElementById('signOutBtn').addEventListener('click', () => window.auth.signOut());
+
+/* Init */
+loadAll();
+</script>
+
+</body>
+</html>
