@@ -1,0 +1,195 @@
+/* ============================================================
+   login.css — split-screen authentication
+   ============================================================ */
+
+body { background: var(--white); }
+
+.login-page {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  min-height: 100vh;
+}
+
+.left-panel {
+  background: var(--navy);
+  color: var(--white);
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.left-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(24,95,165,0.18), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(99,153,34,0.12), transparent 50%);
+  pointer-events: none;
+}
+.left-panel > * { position: relative; z-index: 1; }
+
+.lp-top { display: flex; flex-direction: column; align-items: flex-start; }
+
+.em-badge {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(255,255,255,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--white);
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 28px;
+}
+
+.lp-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.lp-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 20px;
+}
+.lp-champ {
+  font-size: 12px;
+  color: var(--green-light);
+  letter-spacing: 0.4px;
+  margin-bottom: 32px;
+}
+
+.feature-bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+.feature-bullet {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.9);
+}
+.feature-bullet svg {
+  flex-shrink: 0;
+  color: var(--green-light);
+}
+
+.lp-footer {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.4px;
+}
+
+/* Right panel */
+.right-panel {
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+}
+.login-form-wrap {
+  max-width: 400px;
+  width: 100%;
+}
+.login-form-wrap h2 { margin-bottom: 6px; }
+.login-form-wrap p.text-secondary { margin-bottom: 28px; font-size: 14px; }
+
+.password-wrap { position: relative; }
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px; height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+.password-wrap input { padding-right: 44px; }
+
+.forgot-link {
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  color: var(--blue);
+  margin-top: 6px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--border);
+}
+
+.login-spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: var(--white);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.signin-btn { min-height: 48px; font-size: 15px; }
+.signin-btn[disabled] { opacity: 0.7; cursor: not-allowed; }
+
+.tiny-helper {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 20px;
+  text-align: center;
+}
+
+.demo-creds {
+  background: var(--blue-light);
+  color: var(--blue-dark);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 11px;
+  margin-bottom: 20px;
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 767px) {
+  .login-page { grid-template-columns: 1fr; }
+  .left-panel {
+    padding: 18px 20px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    text-align: center;
+  }
+  .lp-top { flex-direction: row; gap: 14px; align-items: center; }
+  .em-badge { width: 48px; height: 48px; font-size: 16px; margin-bottom: 0; }
+  .lp-title { font-size: 16px; margin-bottom: 0; }
+  .lp-sub, .lp-champ, .feature-bullets, .lp-footer { display: none; }
+}
