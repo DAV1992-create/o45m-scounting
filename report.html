@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match report · England Masters</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="report.css">
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+</head>
+<body>
+
+<nav class="nav-top" aria-label="Main navigation">
+  <a class="nav-brand" href="matchday.html">
+    <span style="font-size:18px;color:var(--text-secondary);">←</span>
+    <span class="nav-text"><span class="nav-name">Match report</span><span class="nav-sub">Post-match</span></span>
+  </a>
+  <div class="nav-actions">
+    <a class="btn btn-sm" href="dashboard.html">Dashboard</a>
+  </div>
+</nav>
+
+<main class="page">
+  <header class="page-header">
+    <h1>Match report</h1>
+    <p class="text-secondary">Complete this report and submit to England Hockey.</p>
+  </header>
+
+  <div id="noDataBanner" class="no-data-banner hidden">
+    No match found. Run a match in <a href="matchday.html">matchday</a> and click "Complete match" to start a report.
+  </div>
+
+  <div class="report-layout">
+    <div>
+      <!-- Header fields -->
+      <div class="grid-2">
+        <div class="report-field">
+          <div class="report-field-label">Tournament</div>
+          <input id="fld-tournament" type="text" readonly>
+        </div>
+        <div class="report-field">
+          <div class="report-field-label">Date</div>
+          <input id="fld-date" type="text" readonly>
+        </div>
+        <div class="report-field">
+          <div class="report-field-label">Opponent</div>
+          <input id="fld-opponent" type="text" readonly>
+        </div>
+        <div class="report-field">
+          <div class="report-field-label">Venue</div>
+          <input id="fld-venue" type="text" readonly>
+        </div>
+      </div>
+
+      <div class="score-banner">
+        <span class="small-team">ENG MASTERS vs <span id="banner-opp">—</span></span>
+        <span id="banner-score">0 — 0</span>
+      </div>
+
+      <!-- Events -->
+      <div class="events-section">
+        <div class="events-header" data-toggle-events="goals">
+          <span>⚽ Goalscorers (<span data-count="goals">0</span>)</span>
+          <span class="text-secondary">▼</span>
+        </div>
+        <div class="events-list" data-events="goals"></div>
+      </div>
+
+      <div class="events-section">
+        <div class="events-header" data-toggle-events="cards">
+          <span>🟨 Cards (<span data-count="cards">0</span>)</span>
+          <span class="text-secondary">▼</span>
+        </div>
+        <div class="events-list" data-events="cards"></div>
+      </div>
+
+      <div class="events-section">
+        <div class="events-header" data-toggle-events="subs">
+          <span>🔄 Substitutions (<span data-count="subs">0</span>)</span>
+          <span class="text-secondary">▼</span>
+        </div>
+        <div class="events-list" data-events="subs"></div>
+      </div>
+
+      <!-- Coach report -->
+      <div class="card mt-16">
+        <div class="card-header"><div class="card-title">Coach report</div></div>
+        <div class="card-body">
+
+          <div class="form-group">
+            <label class="form-label" for="motm">Man of the match</label>
+            <select id="motm"><option value="">Select a player...</option></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Performance ratings</label>
+            <div class="rating-row" id="ratingRow"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="summary">Match summary <span style="color:var(--red);">*</span></label>
+            <textarea id="summary" placeholder="Write a summary of the match — tactics, key moments, overall performance..."></textarea>
+            <div class="char-count"><span id="summaryCount">0</span> / 100 minimum</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="indiv">Individual player notes</label>
+            <textarea id="indiv" placeholder="Key observations about individual players for selection purposes..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="next">Next steps / selection implications</label>
+            <textarea id="next" placeholder="Who impressed? Who struggled? Selection thoughts for next tournament..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-actions">
+        <button class="btn btn-primary" id="saveReportBtn" type="button">Save report</button>
+        <button class="btn" id="downloadPdfBtn" type="button">Download as PDF</button>
+        <button class="btn" id="copyTextBtn" type="button">Copy as text</button>
+      </div>
+    </div>
+
+    <aside class="prev-reports">
+      <div class="card prev-reports-card">
+        <div class="card-header"><div class="card-title">Previous reports</div></div>
+        <div class="card-body" id="prevReportsList">
+          <div class="text-secondary text-small">No saved reports yet.</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<nav class="nav-tabs" aria-label="Mobile navigation">
+  <a class="tab-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</a>
+  <a class="tab-item" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Squad</a>
+  <a class="tab-item active" href="matchday.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Matchday</a>
+  <a class="tab-item" href="stats.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>Stats</a>
+  <a class="tab-item" href="contacts.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>More</a>
+</nav>
+
+<script>
+const ratingsState = {};
+let match = null;
+let lineup = [];
+let allEvents = [];
+
+async function load() {
+  const ctx = await window.auth.requireAuth(); if (!ctx) return;
+  if (ctx.demo) return;
+  const supa = await window.sb();
+
+  // Find the match: prefer ?match_id=, else fall back to last completed in this org
+  let matchId = new URLSearchParams(window.location.search).get('match_id');
+  if (!matchId) matchId = localStorage.getItem('em_last_match');
+
+  if (!matchId) {
+    // Use most recent completed match in this org
+    const { data: recent } = await supa.from('matches')
+      .select('id').eq('org_id', ctx.orgId).eq('status','complete')
+      .order('completed_at', { ascending: false, nullsFirst: false }).limit(1);
+    if (recent && recent.length) matchId = recent[0].id;
+  }
+
+  if (!matchId) {
+    document.getElementById('noDataBanner').classList.remove('hidden');
+    return;
+  }
+
+  const { data: m, error: mErr } = await supa.from('matches')
+    .select('*, tournaments(name)').eq('id', matchId).single();
+  if (mErr || !m) {
+    document.getElementById('noDataBanner').classList.remove('hidden');
+    return;
+  }
+  match = m;
+
+  // Fields
+  document.getElementById('fld-tournament').value = m.tournaments?.name || '';
+  document.getElementById('fld-date').value       = new Date(m.match_date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('fld-opponent').value   = m.opponent;
+  document.getElementById('fld-venue').value      = m.venue || '';
+  document.getElementById('banner-opp').textContent = (m.opponent||'OPPONENT').toUpperCase();
+  document.getElementById('banner-score').textContent = `${m.score_home} — ${m.score_away}`;
+
+  // Lineup + events
+  const [lRes, eRes] = await Promise.all([
+    supa.from('match_lineups').select('*, players(*)').eq('match_id', matchId),
+    supa.from('match_events').select('*, players(name, shirt_number, position)').eq('match_id', matchId).order('time_min')
+  ]);
+  lineup = (lRes.data || []).filter(l => l.is_starter).map(l => l.players).filter(Boolean);
+  allEvents = eRes.data || [];
+
+  renderEvents();
+  renderMotm();
+  renderRatings();
+
+  // Load existing report if one exists
+  const { data: existing } = await supa.from('reports').select('*').eq('match_id', matchId).maybeSingle();
+  if (existing) {
+    document.getElementById('summary').value = existing.summary || '';
+    document.getElementById('indiv').value   = existing.individual_notes || '';
+    document.getElementById('next').value    = existing.next_steps || '';
+    if (existing.motm_player_id) document.getElementById('motm').value = existing.motm_player_id;
+    if (existing.ratings) Object.assign(ratingsState, existing.ratings);
+    renderRatings();
+    updateSummaryCount();
+  }
+
+  renderPrevReports(ctx.orgId);
+}
+
+function renderEvents() {
+  const goals = allEvents.filter(e => e.event_type === 'goal' || e.event_type === 'goal_opponent');
+  const cards = allEvents.filter(e => e.event_type === 'yellow' || e.event_type === 'red');
+  const subs  = allEvents.filter(e => e.event_type === 'sub');
+  renderList('goals', goals);
+  renderList('cards', cards);
+  renderList('subs',  subs);
+}
+function renderList(key, list) {
+  document.querySelector(`[data-count="${key}"]`).textContent = list.length;
+  const el = document.querySelector(`[data-events="${key}"]`);
+  if (list.length === 0) { el.innerHTML = '<div class="no-events">No events recorded.</div>'; return; }
+  el.innerHTML = list.map(ev => `
+    <div class="event-line">
+      <span class="log-time">${ev.time_min}'</span>
+      <span>${ev.text || ev.event_type}</span>
+    </div>
+  `).join('');
+}
+
+function renderMotm() {
+  const sel = document.getElementById('motm');
+  sel.innerHTML = '<option value="">Select a player...</option>' +
+    lineup.map(p => `<option value="${p.id}">${p.name}${p.shirt_number?' (#'+p.shirt_number+')':''}</option>`).join('');
+}
+
+function renderRatings() {
+  const posCls = { GK:'avatar-gk', DEF:'avatar-def', MID:'avatar-mid', FWD:'avatar-fwd' };
+  document.getElementById('ratingRow').innerHTML = lineup.map(p => {
+    const initials = p.initials || (p.name||'').split(/\s+/).map(s=>s[0]).slice(0,2).join('').toUpperCase();
+    const rating = ratingsState[p.id] || 0;
+    return `
+      <div class="rating-card" data-player="${p.id}">
+        <span class="avatar avatar-lg ${posCls[p.position]||'avatar-default'}">${initials}</span>
+        <div class="rating-card-name">${p.name||''}</div>
+        <div class="star-rating" data-rating-for="${p.id}">
+          ${[1,2,3,4,5].map(n => `<span class="star ${n<=rating?'filled':''}" data-value="${n}">★</span>`).join('')}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+document.getElementById('ratingRow').addEventListener('click', e => {
+  const star = e.target.closest('.star'); if (!star) return;
+  const wrap = star.closest('.star-rating');
+  const pid = wrap.dataset.ratingFor;
+  const val = parseInt(star.dataset.value, 10);
+  ratingsState[pid] = val;
+  wrap.querySelectorAll('.star').forEach(s => s.classList.toggle('filled', parseInt(s.dataset.value,10) <= val));
+});
+
+const summary = document.getElementById('summary');
+const summaryCount = document.getElementById('summaryCount');
+function updateSummaryCount() {
+  summaryCount.textContent = summary.value.length;
+  summaryCount.style.color = summary.value.length >= 100 ? 'var(--green)' : 'var(--text-secondary)';
+}
+summary.addEventListener('input', updateSummaryCount);
+
+document.querySelectorAll('[data-toggle-events]').forEach(h => {
+  h.addEventListener('click', () => {
+    const list = document.querySelector(`[data-events="${h.dataset.toggleEvents}"]`);
+    list.classList.toggle('collapsed');
+  });
+});
+
+async function buildReport() {
+  const user = await window.auth.getUser();
+  return {
+    match_id: match.id,
+    motm_player_id: document.getElementById('motm').value || null,
+    summary: summary.value,
+    individual_notes: document.getElementById('indiv').value,
+    next_steps: document.getElementById('next').value,
+    ratings: ratingsState,
+    created_by: user.id
+  };
+}
+
+document.getElementById('saveReportBtn').addEventListener('click', async () => {
+  if (!match) { alert('No match loaded.'); return; }
+  if (summary.value.length < 100) { alert('Match summary must be at least 100 characters.'); summary.focus(); return; }
+  const btn = document.getElementById('saveReportBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const supa = await window.sb();
+  const payload = await buildReport();
+  // Try update first, else insert
+  const { data: existing } = await supa.from('reports').select('id').eq('match_id', match.id).maybeSingle();
+  let error;
+  if (existing) {
+    ({ error } = await supa.from('reports').update(payload).eq('id', existing.id));
+  } else {
+    ({ error } = await supa.from('reports').insert(payload));
+  }
+  btn.disabled = false; btn.textContent = 'Save report';
+  if (error) { alert('Could not save: ' + error.message); return; }
+  alert('Report saved.');
+  const ctx = await window.auth.requireAuth();
+  if (ctx) renderPrevReports(ctx.orgId);
+});
+
+document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+  document.querySelectorAll('.events-list').forEach(l => l.classList.remove('collapsed'));
+  window.print();
+});
+
+document.getElementById('copyTextBtn').addEventListener('click', async () => {
+  if (!match) return;
+  const motmName = document.getElementById('motm').selectedOptions[0]?.textContent || '—';
+  const goals = allEvents.filter(e => e.event_type === 'goal');
+  const cards = allEvents.filter(e => e.event_type === 'yellow' || e.event_type === 'red');
+  const subs  = allEvents.filter(e => e.event_type === 'sub');
+  const lines = [
+    `MATCH REPORT — England Masters`,
+    `${match.tournaments?.name || ''} · ${match.match_date}`,
+    `vs ${match.opponent}  ·  ${match.venue||''}`,
+    `Final score: ENG ${match.score_home} – ${match.score_away} ${match.opponent}`,
+    ``,
+    `Goalscorers:`,
+    ...(goals.length ? goals.map(g => `  ${g.time_min}' — ${g.text}`) : ['  (none)']),
+    ``,
+    `Cards:`,
+    ...(cards.length ? cards.map(c => `  ${c.time_min}' — ${c.text}`) : ['  (none)']),
+    ``,
+    `Substitutions:`,
+    ...(subs.length ? subs.map(s => `  ${s.time_min}' — ${s.text}`) : ['  (none)']),
+    ``,
+    `Man of the match: ${motmName}`,
+    ``,
+    `Match summary:`,
+    summary.value || '—',
+    ``,
+    `Individual player notes:`,
+    document.getElementById('indiv').value || '—',
+    ``,
+    `Next steps / selection implications:`,
+    document.getElementById('next').value || '—'
+  ].join('\n');
+  try { await navigator.clipboard.writeText(lines); alert('Report copied to clipboard.'); }
+  catch { prompt('Copy the report below:', lines); }
+});
+
+async function renderPrevReports(orgId) {
+  const supa = await window.sb();
+  const { data: matches } = await supa.from('matches')
+    .select('id, match_date, opponent, tournaments(name)')
+    .eq('org_id', orgId).eq('status','complete')
+    .order('match_date', { ascending: false }).limit(8);
+  if (!matches || matches.length === 0) return;
+  const ids = matches.map(m => m.id);
+  const { data: reports } = await supa.from('reports').select('match_id').in('match_id', ids);
+  const withReport = new Set((reports||[]).map(r => r.match_id));
+  const wrap = document.getElementById('prevReportsList');
+  wrap.innerHTML = matches.map(m => {
+    const d = new Date(m.match_date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    return `
+      <div style="padding:8px 0;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <div style="min-width:0;flex:1;">
+          <div style="font-size:13px;font-weight:500;" class="truncate">vs ${m.opponent}${withReport.has(m.id)?' ✓':''}</div>
+          <div style="font-size:11px;color:var(--text-secondary);">${m.tournaments?.name||''} · ${d}</div>
+        </div>
+        <a class="btn btn-sm" href="report.html?match_id=${m.id}">View</a>
+      </div>
+    `;
+  }).join('');
+}
+
+load();
+</script>
+
+</body>
+</html>
