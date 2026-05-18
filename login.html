@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Sign in to the England Masters coaching platform.">
+<title>Sign in · England Masters</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="login.css">
+<script src="supabase-client.js"></script>
+<script src="auth.js"></script>
+</head>
+<body>
+
+<div class="login-page">
+
+  <!-- LEFT -->
+  <aside class="left-panel" aria-label="Brand">
+    <div class="lp-top">
+      <div class="em-badge">EM</div>
+      <div class="lp-title">England Masters</div>
+      <div class="lp-sub">Men O45s Coaching Platform</div>
+      <div class="lp-champ">🏆 Indoor World Cup Champions 2025</div>
+
+      <div class="feature-bullets" aria-label="Features">
+        <div class="feature-bullet">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Squad management &amp; selection
+        </div>
+        <div class="feature-bullet">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Live matchday tools
+        </div>
+        <div class="feature-bullet">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Player statistics &amp; development
+        </div>
+      </div>
+    </div>
+
+    <div class="lp-footer">Powered by Zandersphere Digital</div>
+  </aside>
+
+  <!-- RIGHT -->
+  <main class="right-panel">
+    <div class="login-form-wrap">
+
+      <!-- Mode tabs -->
+      <div class="view-toggle mb-16" id="modeToggle" style="margin-bottom:20px;">
+        <button class="active" data-mode="signin" type="button">Sign in</button>
+        <button data-mode="signup" type="button">Create account</button>
+      </div>
+
+      <!-- SIGN IN -->
+      <div id="signinPane">
+        <h2>Welcome back</h2>
+        <p class="text-secondary">Sign in to your coaching platform</p>
+
+        <form id="signinForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="si-email">Email address</label>
+            <input id="si-email" type="email" autocomplete="email" required>
+            <span class="error-msg hidden" id="siEmailErr">Enter a valid email address.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="si-password">Password</label>
+            <div class="password-wrap">
+              <input id="si-password" type="password" autocomplete="current-password" required>
+              <button type="button" class="password-toggle" data-toggle="si-password" aria-label="Show password">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <span class="error-msg hidden" id="siPwErr">Enter your password.</span>
+          </div>
+
+          <label class="checkbox-row mb-16">
+            <input type="checkbox" id="remember">
+            <span>Remember me on this device</span>
+          </label>
+
+          <button class="btn btn-primary btn-full signin-btn" id="signinBtn" type="submit">Sign in</button>
+          <a class="forgot-link" href="#" id="forgotLink">Forgot your password?</a>
+        </form>
+      </div>
+
+      <!-- SIGN UP -->
+      <div id="signupPane" class="hidden">
+        <h2>Create your account</h2>
+        <p class="text-secondary">Start a new programme or join an existing one.</p>
+
+        <!-- Signup choice -->
+        <div class="view-toggle mb-16" id="signupChoice">
+          <button class="active" data-choice="new" type="button">New programme</button>
+          <button data-choice="join" type="button">Join with invite</button>
+        </div>
+
+        <form id="signupForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="su-name">Your name</label>
+            <input id="su-name" type="text" autocomplete="name" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="su-email">Email</label>
+            <input id="su-email" type="email" autocomplete="email" required>
+            <span class="error-msg hidden" id="suEmailErr">Enter a valid email address.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="su-password">Password (min 8 characters)</label>
+            <div class="password-wrap">
+              <input id="su-password" type="password" autocomplete="new-password" minlength="8" required>
+              <button type="button" class="password-toggle" data-toggle="su-password" aria-label="Show password">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <span class="error-msg hidden" id="suPwErr">Password must be at least 8 characters.</span>
+          </div>
+
+          <!-- New programme block -->
+          <div id="newProgrammeFields">
+            <div class="form-group">
+              <label class="form-label" for="su-org">Programme name</label>
+              <input id="su-org" type="text" placeholder="e.g. England Masters Men O45s">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="su-age">Age group</label>
+              <select id="su-age">
+                <option>O45</option>
+                <option>O50</option>
+                <option>O55</option>
+                <option>O60</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Join block -->
+          <div id="joinFields" class="hidden">
+            <div class="form-group">
+              <label class="form-label" for="su-invite">Invite code</label>
+              <input id="su-invite" type="text" placeholder="8-character code" maxlength="8">
+              <div class="text-small text-secondary mt-8">Ask your head coach for the invite code from their dashboard.</div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full signin-btn" id="signupBtn" type="submit">Create account</button>
+          <div class="error-msg mt-12 hidden" id="suError"></div>
+        </form>
+      </div>
+
+      <div class="tiny-helper" id="footHelper">
+        Forgot your password? Use the link above to receive a reset email.
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+/* Mode toggle */
+const modeToggle = document.getElementById('modeToggle');
+modeToggle.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  modeToggle.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  const isSignup = b.dataset.mode === 'signup';
+  document.getElementById('signinPane').classList.toggle('hidden', isSignup);
+  document.getElementById('signupPane').classList.toggle('hidden', !isSignup);
+});
+
+/* Signup choice toggle */
+const choice = document.getElementById('signupChoice');
+choice.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  choice.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  const isJoin = b.dataset.choice === 'join';
+  document.getElementById('newProgrammeFields').classList.toggle('hidden', isJoin);
+  document.getElementById('joinFields').classList.toggle('hidden', !isJoin);
+});
+
+/* Password toggles */
+document.querySelectorAll('.password-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.toggle);
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+  });
+});
+
+/* Show config banner */
+window.addEventListener('DOMContentLoaded', () => {
+  if (!window.SUPABASE_CONFIGURED) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#BA7517;color:#fff;padding:10px;font-size:13px;text-align:center;font-family:Inter,sans-serif;';
+    banner.innerHTML = '⚠️ Edit <code>supabase-client.js</code> with your Supabase URL and anon key (see README).';
+    document.body.appendChild(banner);
+  }
+});
+
+/* Validators */
+function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+/* Sign in */
+document.getElementById('signinForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = document.getElementById('si-email').value.trim();
+  const pw    = document.getElementById('si-password').value;
+  const emailErr = document.getElementById('siEmailErr');
+  const pwErr    = document.getElementById('siPwErr');
+  const btn      = document.getElementById('signinBtn');
+  emailErr.classList.add('hidden'); pwErr.classList.add('hidden');
+  document.getElementById('si-email').classList.remove('input-error');
+  document.getElementById('si-password').classList.remove('input-error');
+
+  let ok = true;
+  if (!isValidEmail(email)) { emailErr.classList.remove('hidden'); document.getElementById('si-email').classList.add('input-error'); ok = false; }
+  if (!pw) { pwErr.classList.remove('hidden'); document.getElementById('si-password').classList.add('input-error'); ok = false; }
+  if (!ok) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="login-spinner"></span> Signing in...';
+  try {
+    await window.auth.signIn({ email, password: pw });
+    window.location.href = 'dashboard.html';
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Sign in';
+    pwErr.textContent = err.message || 'Sign in failed';
+    pwErr.classList.remove('hidden');
+    document.getElementById('si-password').classList.add('input-error');
+  }
+});
+
+/* Sign up */
+document.getElementById('signupForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const name      = document.getElementById('su-name').value.trim();
+  const email     = document.getElementById('su-email').value.trim();
+  const password  = document.getElementById('su-password').value;
+  const isJoin    = document.querySelector('#signupChoice .active').dataset.choice === 'join';
+  const orgName   = document.getElementById('su-org').value.trim();
+  const ageGroup  = document.getElementById('su-age').value;
+  const inviteCode = document.getElementById('su-invite').value.trim();
+  const errBox    = document.getElementById('suError');
+  const btn       = document.getElementById('signupBtn');
+
+  errBox.classList.add('hidden');
+
+  if (!isValidEmail(email)) { errBox.textContent = 'Enter a valid email.'; errBox.classList.remove('hidden'); return; }
+  if (password.length < 8)   { errBox.textContent = 'Password must be at least 8 characters.'; errBox.classList.remove('hidden'); return; }
+  if (!isJoin && !orgName)   { errBox.textContent = 'Programme name required.'; errBox.classList.remove('hidden'); return; }
+  if (isJoin && !inviteCode) { errBox.textContent = 'Invite code required.'; errBox.classList.remove('hidden'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="login-spinner"></span> Creating...';
+  try {
+    await window.auth.signUp({
+      email, password,
+      displayName: name,
+      orgName: isJoin ? null : orgName,
+      ageGroup,
+      inviteCode: isJoin ? inviteCode : null
+    });
+    window.location.href = 'dashboard.html';
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Create account';
+    errBox.textContent = err.message || 'Could not create account.';
+    errBox.classList.remove('hidden');
+  }
+});
+
+/* Forgot password */
+document.getElementById('forgotLink').addEventListener('click', async e => {
+  e.preventDefault();
+  const email = document.getElementById('si-email').value.trim();
+  if (!isValidEmail(email)) { alert('Enter your email above first.'); return; }
+  try {
+    const supa = await window.sb();
+    const { error } = await supa.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname.replace(/login\.html$/, 'login.html')
+    });
+    if (error) throw error;
+    alert('Password reset email sent (check your inbox).');
+  } catch (err) {
+    alert('Could not send reset email: ' + err.message);
+  }
+});
+</script>
+
+</body>
+</html>
