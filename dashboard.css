@@ -1,0 +1,112 @@
+/* ============================================================
+   dashboard.css — page-specific styles for dashboard.html
+   ============================================================ */
+
+/* Roster search inline in card header */
+.roster-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
+}
+.roster-search input[type="search"] {
+  max-width: 220px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.roster-filters {
+  padding: 10px 16px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--white);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.roster-filters .filter-row { flex-wrap: nowrap; min-width: min-content; }
+
+.player-list-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.add-player-bar {
+  padding: 12px 16px;
+  border-top: 0.5px solid var(--border);
+  background: var(--surface);
+}
+
+/* Tournament list items */
+.tourney-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.tourney-item:last-of-type { border-bottom: none; }
+.tourney-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.tourney-info { flex: 1; min-width: 0; }
+.tourney-name { font-size: 13px; font-weight: 500; }
+.tourney-meta { font-size: 11px; color: var(--text-secondary); }
+
+/* Area breakdown bars */
+.area-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+}
+.area-name {
+  font-size: 11px;
+  color: var(--text-secondary);
+  width: 80px;
+  flex-shrink: 0;
+}
+.area-track {
+  flex: 1;
+  height: 5px;
+  background: var(--surface);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.area-fill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 3px;
+  transition: width 0.3s ease-out;
+}
+.area-count {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  width: 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Invite rows */
+.invite-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+  gap: 8px;
+}
+.invite-row:last-of-type { border-bottom: none; }
+.invite-info { flex: 1; min-width: 0; }
+.invite-name { font-size: 13px; font-weight: 500; }
+.invite-role { font-size: 11px; color: var(--text-secondary); }
+
+@media (max-width: 767px) {
+  .roster-search { justify-content: flex-start; width: 100%; }
+  .roster-search input[type="search"] { max-width: 100%; flex: 1; }
+}
